@@ -1,17 +1,26 @@
+let cycle = true;
+let cycleTime = 10000;
+
 let pages = ['/', '/stocks', '/news'];
-let currentPage = 0;
+let currentPage = localStorage.getItem('currentPage') || 0;
 
 function showNextPage() {
     currentPage = (currentPage + 1) % pages.length;
+    localStorage.setItem('currentPage', currentPage);
     window.location.href = pages[currentPage];
 }
 
 function showPreviousPage() {
     currentPage = (currentPage - 1 + pages.length) % pages.length;
+    localStorage.setItem('currentPage', currentPage);
     window.location.href = pages[currentPage];
 }
 
-// Automatically change page every 10 seconds
-setInterval(showNextPage, 10000);
+// Change page if cycle is enabled 
+function cyclePages() {
+    if (cycle) {
+        showNextPage();
+    }
+}
 
-// You can call showNextPage() and showPreviousPage() from external events if needed
+setInterval(cyclePages, cycleTime);

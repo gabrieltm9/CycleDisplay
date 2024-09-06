@@ -1,13 +1,74 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row">
-    <div class="col-12 text-center">
-        <h1>Weather - Tokyo</h1>
-        <h2>13.7°C - Overcast</h2>
-        <p>Feels like 13.8°C</p>
-        <p>Wind Speed: 3.9km/h</p>
-        <p>Humidity: 90%</p>
-        <!-- Add more info similar to the image -->
+<script src="/static/js/weather.js"></script>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Left side: Weather summary -->
+    <div class="col-md-6 text-center">
+      <h2>{{ location }}</h2>
+      <img id="weather-icon" src="" alt="Weather Icon" height="120" class="img-fluid mb-4">
+      <h1 id="current-temp" class="display-1">{{ weather['current']['temperature_2m'] }}°C</h1>
+      <p class="mb-4" id="weather-desc">Weather Code: {{ weather['current']['weather_code'] }}</p>
+      <div class="d-flex justify-content-around mb-4">
+        <div>
+          <img src="https://basmilius.github.io/weather-icons/production/fill/all/thermometer.svg" alt="Feels Like" height="48">
+          <p>Feels like: <span id="feels-like">{{ weather['current']['apparent_temperature'] }}°C</span></p>
+        </div>
+        <div>
+          <img src="https://basmilius.github.io/weather-icons/production/fill/all/wind.svg" alt="Wind Speed" height="48">
+          <p>Wind Speed: <span id="wind-speed">{{ weather['current']['wind_speed_10m'] }} km/h</span></p>
+        </div>
+        <div>
+          <img src="https://basmilius.github.io/weather-icons/production/fill/all/humidity.svg" alt="Humidity" height="48">
+          <p>Humidity: <span id="humidity">{{ weather['current']['relative_humidity_2m'] }}%</span></p>
+        </div>
+      </div>
     </div>
+
+    <!-- Right side: Weekly forecast -->
+    <div class="col-md-6">
+      <h3>Weekly Forecast</h3>
+      <div class="row text-center">
+        <!-- Loop through each day's forecast -->
+        {% for i in range(0, 7) %}
+        <div class="col text-center">
+          <p>{{ weather['daily']['time'][i] }}</p>
+          <img id="forecast-icon-{{i}}" src="" alt="Weather Icon" height="48" class="img-fluid">
+          <p><span>{{ weather['daily']['temperature_2m_max'][i] }}°C</span> / <span>{{ weather['daily']['temperature_2m_min'][i] }}°C</span></p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Details for Today -->
+  <div class="row mt-4 text-center">
+    <div class="col">
+      <img src="https://basmilius.github.io/weather-icons/production/fill/all/sunrise.svg" alt="Sunrise" height="48">
+      <h6>Sunrise</h6>
+      <p>{{ weather['daily']['sunrise'][0] }}</p>
+    </div>
+    <div class="col">
+      <img src="https://basmilius.github.io/weather-icons/production/fill/all/sunset.svg" alt="Sunset" height="48">
+      <h6>Sunset</h6>
+      <p>{{ weather['daily']['sunset'][0] }}</p>
+    </div>
+    <div class="col">
+      <img src="https://basmilius.github.io/weather-icons/production/fill/all/raindrop.svg" alt="Precipitation" height="48">
+      <h6>Precipitation</h6>
+      <p>{{ weather['current']['precipitation'] }}mm</p>
+    </div>
+    <div class="col">
+      <img src="https://basmilius.github.io/weather-icons/production/fill/all/uv-index.svg" alt="UV Index" height="48">
+      <h6>UV Index</h6>
+      <p>{{ weather['daily']['uv_index_max'][0] }}</p>
+    </div>
+    <div class="col">
+      <img src="https://basmilius.github.io/weather-icons/production/fill/all/compass.svg" alt="Wind Direction" height="48">
+      <h6>Wind Direction</h6>
+      <p>{{ weather['current']['wind_direction_10m'] }}°</p>
+    </div>
+  </div>
 </div>
 {% endblock %}
