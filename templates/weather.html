@@ -8,12 +8,12 @@
     <div class="col-md-6 text-center">
       <h2>{{ location }}</h2>
       <img id="weather-icon" src="" alt="Weather Icon" height="120" class="img-fluid mb-4">
-      <h1 id="current-temp" class="display-1">{{ weather['current']['temperature_2m'] }}°C</h1>
+      <h1 id="current-temp" class="display-1">{{ weather['current']['temperature_2m'] }}°F</h1>
       <p class="mb-4" id="weather-desc">Weather Code: {{ weather['current']['weather_code'] }}</p>
       <div class="d-flex justify-content-around mb-4">
         <div>
           <img src="https://basmilius.github.io/weather-icons/production/fill/all/thermometer.svg" alt="Feels Like" height="48">
-          <p>Feels like: <span id="feels-like">{{ weather['current']['apparent_temperature'] }}°C</span></p>
+          <p>Feels like: <span id="feels-like">{{ weather['current']['apparent_temperature'] }}°F</span></p>
         </div>
         <div>
           <img src="https://basmilius.github.io/weather-icons/production/fill/all/wind.svg" alt="Wind Speed" height="48">
@@ -35,7 +35,7 @@
         <div class="col text-center">
           <p>{{ weather['daily']['time'][i] }}</p>
           <img id="forecast-icon-{{i}}" src="" alt="Weather Icon" height="48" class="img-fluid">
-          <p><span>{{ weather['daily']['temperature_2m_max'][i] }}°C</span> / <span>{{ weather['daily']['temperature_2m_min'][i] }}°C</span></p>
+          <p><span>{{ weather['daily']['temperature_2m_max'][i] }}°F</span> / <span>{{ weather['daily']['temperature_2m_min'][i] }}°F</span></p>
         </div>
         {% endfor %}
       </div>

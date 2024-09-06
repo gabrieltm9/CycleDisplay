@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify
 import aiohttp
 import asyncio
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -18,6 +19,21 @@ async def get_weather(location):
         async with session.get(weather_url) as response:
             weather_response = await response.json()
 
+    def celcius_to_fahrenheit(celcius):
+        if isinstance(celcius, list):
+            return [round(c * 9/5 + 32, 1) for c in celcius]
+        else:
+            return round(celcius * 9/5 + 32, 1)
+
+    # Convert celcius to fahrenheit
+    weather_response['current']['temperature_2m'] = celcius_to_fahrenheit(weather_response['current']['temperature_2m'])
+    weather_response['daily']['temperature_2m_max'] = celcius_to_fahrenheit(weather_response['daily']['temperature_2m_max'])
+    weather_response['daily']['temperature_2m_min'] = celcius_to_fahrenheit(weather_response['daily']['temperature_2m_min'])
+
+    # Modify sunrise and sunset to HH:MM format using strftime. First convert to datetime object
+    weather_response['daily']['sunrise'][0] = datetime.strptime(weather_response['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+    weather_response['daily']['sunset'][0] = datetime.strptime(weather_response['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+    
     # Pass location name and weather data to the template, including weather codes
     return render_template('weather.html', location=location.capitalize(), weather=weather_response)
 
