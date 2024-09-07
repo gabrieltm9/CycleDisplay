@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="row">
-    <div class="col-12 text-center">
+    <div class="col-4">
         <h1>Stock Prices</h1>
-        <ul>
-            <li>Apple: $150</li>
-            <li>Google: $2750</li>
-            <li>Amazon: $3400</li>
+        <ul style="list-style: none;">
+            {% for stock in stock_prices %}
+            <li>
+                <img src="https://assets.parqet.com/logos/symbol/{{ stock.symbol }}?format=png" alt="{{ stock.symbol }} logo" style="width: 20px; height: 20px;">
+                {{ stock.symbol }}: ${{ stock.price | round(2) }}
+            </li>
+            {% endfor %}
         </ul>
+    </div>
+    <div class="col-8">
+        <h1>S&P 500 - Past Month</h1>
+        <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="img-graph">
     </div>
 </div>
 {% endblock %}

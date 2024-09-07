@@ -28,6 +28,11 @@ img.img-fluid {
     max-width: 100px;
 }
 
+.img-graph {
+    width: 100%;
+    height: auto;
+}
+
 .weekly-forecast .col {
     margin: 10px 0;
 }
