@@ -51,9 +51,13 @@ def stocks():
 def news():
     return render_template('news.html')
 
+
+@app.route('/fifa')
+def fifa():
+    return render_template('fifa.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
 
 @app.route('/favicon.ico')
 def favicon():
