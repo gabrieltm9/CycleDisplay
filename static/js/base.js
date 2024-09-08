@@ -1,7 +1,7 @@
 let cycle = true;
 let cycleTime = 10000;
 
-let pages = ['/weather', '/stocks', '/news'];
+let pages = ['/weather', '/stocks', '/news', '/fifa'];
 let currentPage = 0;
 
 function loadPage(page) {

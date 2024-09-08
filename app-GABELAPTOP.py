@@ -2,7 +2,6 @@ import os
 from flask import Flask, render_template, send_from_directory
 import asyncio
 from datetime import datetime
-from fifa import render_fifa
 from stocks import get_stock_prices, get_sp500_graph
 from weather import get_weather, celcius_to_fahrenheit
 
@@ -55,7 +54,7 @@ def news():
 
 @app.route('/fifa')
 def fifa():
-    return render_fifa()
+    return render_template('fifa.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

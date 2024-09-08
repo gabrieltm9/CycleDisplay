@@ -5,20 +5,23 @@ import requests
 
 app = Flask(__name__)
 
-# URL to shared Google Sheet for recent games
-recent_games_url = 'https://docs.google.com/spreadsheets/d/e/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/pub?sheet=Sheet1&range=A2%3AJ7&output=csv'
-# URL to shared Google Sheet for head-to-head data
-head_to_head_url = 'https://docs.google.com/spreadsheets/d/e/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/pub?sheet=Sheet1&range=M2%3AR6&output=csv'
-# URL to shared Google Sheet for total goals
-total_goals_url = 'https://docs.google.com/spreadsheets/d/e/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/pub?sheet=Sheet1&range=M10%3AR14&output=csv'
+# Corrected URLs for shared Google Sheets with CSV format
+recent_games_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/gviz/tq?tqx=out:csv&range=A1:J8'
+head_to_head_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/gviz/tq?tqx=out:csv&range=M1:R6'
+total_goals_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/gviz/tq?tqx=out:csv&range=M9:R14'
 
 def fetch_data(url):
     """Fetch CSV data from the Google Sheets shared URL."""
     response = requests.get(url)
-    return pd.read_csv(io.BytesIO(response.content))
+    if response.status_code == 200:
+        df = pd.read_csv(io.BytesIO(response.content), sep=',')
+        df = df.fillna("")  # Replace all NaNs with empty strings
+        df = df.dropna(axis=1, how='all')  # Drop columns that are all NaN
+        return df
+    else:
+        raise Exception(f"Error fetching data from {url}")
 
-@app.route('/fifa')
-def fifa():
+def render_fifa():
     # Fetch the data for recent games, head-to-head, and total goals
     recent_games_df = fetch_data(recent_games_url)
     head_to_head_df = fetch_data(head_to_head_url)
@@ -27,7 +30,11 @@ def fifa():
     # Pass the dataframes to the HTML template
     return render_template(
         'fifa.html',
-        recent_games=recent_games_df.to_dict(orient='records'),
-        head_to_head=head_to_head_df.to_dict(orient='records'),
-        total_goals=total_goals_df.to_dict(orient='records')
+        recent_games=df_to_html(recent_games_df),
+        head_to_head=df_to_html(head_to_head_df),
+        total_goals=df_to_html(total_goals_df)
     )
+
+def df_to_html(df):
+    """Convert a DataFrame to an HTML table."""
+    return df.to_html(classes=["table", "table-bordered", "table-striped", "table-hover", "table-sm"], index=False)
