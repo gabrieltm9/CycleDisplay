@@ -17,20 +17,25 @@ def get_stock_prices(symbols):
         stock_data.append({'symbol': symbol, 'price': price})
     return stock_data
 
-# Function to generate S&P 500 graph with improved aesthetics
-def get_sp500_graph():
+# Function to fetch the S&P 500 data for the past 5 days
+def fetch_sp500_data():
     sp500 = yf.Ticker("^GSPC")
-    sp500_data = sp500.history(period="1mo")
+    sp500_data = sp500.history(period="5d")  # Fetch past 5 days' data
+    return sp500_data
 
+# Function to generate S&P 500 graph with improved aesthetics
+def get_sp500_graph(sp500_data):
     # Plot the S&P 500 data with improved aesthetics
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(sp500_data.index, sp500_data['Close'], label='S&P 500', color='blue', linewidth=2)
 
     # Improve formatting
-    ax.set_title('S&P 500 Performance - Past Month', fontsize=14, weight='bold')
+    ax.set_title('S&P 500 Performance - Past 5 Days', fontsize=14, weight='bold')
     ax.set_xlabel('Date', fontsize=12)
     ax.set_ylabel('Price', fontsize=12)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    
+    # Format the x-axis to show only day and month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     plt.xticks(rotation=45)
     ax.grid(True)
 
@@ -45,3 +50,13 @@ def get_sp500_graph():
     buf.close()
 
     return image_base64
+
+# Function to calculate the total and percentage change over the past 5 days
+def get_sp500_change(sp500_data):
+    # Calculate total and percentage change
+    start_price = sp500_data['Close'].iloc[0]
+    end_price = sp500_data['Close'].iloc[-1]
+    total_change = end_price - start_price
+    percentage_change = (total_change / start_price) * 100
+
+    return total_change, percentage_change

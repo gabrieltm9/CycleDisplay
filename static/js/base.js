@@ -47,16 +47,22 @@ function showPreviousPage() {
     loadPage(pages[currentPage]);
 }
 
-// Change page if cycle is enabled 
-function cyclePages() {
-    if (cycle) {
-        showNextPage();
-    }
-}
-
 window.onload = function() {
-    setTimeout(function() {
-        loadPage(pages[currentPage]);
-        setInterval(cyclePages, cycleTime);
-    }, 5000);
+    // Check if the current URL is not '/'
+    if (window.location.pathname !== '/') {
+        // Find the index of the current URL in the pages array
+        const index = pages.findIndex(page => page === window.location.pathname);
+        if (index !== -1) {
+            currentPage = index;
+            loadPage(pages[index]);
+        } else {
+            currentPage = -1;
+            loadPage("/");
+        }
+    } else {
+        setTimeout(function() {}, 3000);
+        if (cycle) {
+            setInterval(showNextPage, cycleTime);
+        }
+    }
 }

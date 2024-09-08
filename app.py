@@ -3,7 +3,7 @@ from flask import Flask, render_template, send_from_directory
 import asyncio
 from datetime import datetime
 from fifa import render_fifa
-from stocks import get_stock_prices, get_sp500_graph
+from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
 from weather import get_weather, celcius_to_fahrenheit
 
 app = Flask(__name__)
@@ -44,9 +44,13 @@ def weather():
 def stocks():
     stock_symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
     stock_prices = get_stock_prices(stock_symbols)
-    sp500_graph = get_sp500_graph()
 
-    return render_template('stocks.html', stock_prices=stock_prices, sp500_graph=sp500_graph)
+    sp500_data = fetch_sp500_data()
+    sp500_graph = get_sp500_graph(sp500_data)
+    sp500_change = get_sp500_change(sp500_data)
+    print(sp500_change)
+
+    return render_template('stocks.html', stock_prices=stock_prices, sp500_graph=sp500_graph, sp500_change=sp500_change)
 
 @app.route('/news')
 def news():

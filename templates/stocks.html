@@ -14,8 +14,9 @@
         </ul>
     </div>
     <div class="col-8">
-        <h1>S&P 500 - Past Month</h1>
+        <h1>S&P 500 - 5 Days</h1>
         <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="img-graph">
+        {{ sp500_change[0] | round(2) }} | {{ sp500_change[1] | round(2) }}%
     </div>
 </div>
 {% endblock %}
