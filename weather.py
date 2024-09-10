@@ -17,7 +17,11 @@ async def get_coordinates(city):
     return lat, lon
 
 async def get_weather(location):
-    lat, lon = await get_coordinates(location)
+    if location == 'boston':
+        lat, lon = 42.361145, -71.057083
+    else:
+        lat, lon = await get_coordinates(location)
+
     if lat is None or lon is None:
         return jsonify({'error': 'Location not found'}), 404
 

@@ -18,7 +18,9 @@
 </head>
 <body>
     <div class="container-fluid">
-        {% block content %}{% endblock %}
+        {% block content %}
+        <p>Next data refresh in: {{ time_until_refresh }}</p>
+        {% endblock %}
     </div>
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
 </body>

@@ -1,70 +1,114 @@
 import os
 from flask import Flask, render_template, send_from_directory
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from fifa import render_fifa
 from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
 from weather import get_weather, celcius_to_fahrenheit
 
 app = Flask(__name__)
 
-# Get weather data from Open-Meteo for hardcoded locations
-@app.route('/weather/<location>')
-async def location_weather(location):
-    # Call get_weather function from weather.py
-    weather_response = await get_weather(location)
+# Global variables to store the latest data and time of the last update
+latest_weather = None
+latest_stocks = None
+last_update_time = None
+time_remaining = timedelta(0)
+refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 
-    # Convert celcius to fahrenheit
-    weather_response['current']['temperature_2m'] = celcius_to_fahrenheit(weather_response['current']['temperature_2m'])
-    weather_response['daily']['temperature_2m_max'] = celcius_to_fahrenheit(weather_response['daily']['temperature_2m_max'])
-    weather_response['daily']['temperature_2m_min'] = celcius_to_fahrenheit(weather_response['daily']['temperature_2m_min'])
+# Async function to fetch and update weather and stock data
+async def update_data():
+    global latest_weather, latest_stocks, last_update_time, time_remaining, refresh_interval
+    stock_symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
+    try:
+        # Update the last update time
+        last_update_time = datetime.now()
 
-    # Modify sunrise and sunset to HH:MM format using strftime. First convert to datetime object
-    weather_response['daily']['sunrise'][0] = datetime.strptime(weather_response['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
-    weather_response['daily']['sunset'][0] = datetime.strptime(weather_response['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+        print(f"Updating data at {last_update_time}")
+
+        # Fetch weather for a hardcoded location (e.g., 'boston')
+        latest_weather = await get_weather('boston')
+        latest_weather['current']['temperature_2m'] = celcius_to_fahrenheit(latest_weather['current']['temperature_2m'])
+        latest_weather['daily']['temperature_2m_max'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_max'])
+        latest_weather['daily']['temperature_2m_min'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_min'])
+        latest_weather['daily']['sunrise'][0] = datetime.strptime(latest_weather['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+        latest_weather['daily']['sunset'][0] = datetime.strptime(latest_weather['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+        wind_directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+        latest_weather['current']['wind_direction_10m'] = wind_directions[int((latest_weather['current']['wind_direction_10m'] + 22.5) / 45) % 8]
+        
+        print("Weather data updated successfully! Temp: " + str(latest_weather['current']['temperature_2m']))
+
+        # Fetch stock prices and S&P 500 data
+        stock_prices = get_stock_prices(stock_symbols)
+        sp500_data = fetch_sp500_data()
+        sp500_graph = get_sp500_graph(sp500_data)
+        sp500_change = get_sp500_change(sp500_data)
+        latest_stocks = {
+            'stock_prices': stock_prices,
+            'sp500_graph': sp500_graph,
+            'sp500_change': sp500_change
+        }
+
+        ibm_price = next(item['price'] for item in stock_prices if item['symbol'] == 'IBM')
+        print("Stock data updated successfully! IBM: " + str(ibm_price))
+    except Exception as e:
+        print(f"Error updating data: {e}")
+        
+
+# Function to calculate the time until the next refresh
+def time_until_next_refresh():
+    global time_remaining
+    if last_update_time is None:
+        return timedelta(seconds=0)
+    time_remaining = last_update_time + refresh_interval - datetime.now()
+    return time_remaining
+
+# Route to return the weather page using the cached weather data
+@app.route('/weather')
+async def weather():
+    global latest_weather
+    time_remaining = await check_update()
+
+    if latest_weather is None:
+        return "Weather data is not available yet. Please try again later."
+    return render_template('weather.html', location='Boston', weather=latest_weather, time_until_refresh=time_remaining)
+
+# Route to return the stocks page using the cached stock data
+@app.route('/stocks')
+async def stocks():
+    global latest_stocks
+    time_remaining = await check_update()
     
-    # Modify wind direction to be more human-readable
-    wind_directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
-    weather_response['current']['wind_direction_10m'] = wind_directions[int((weather_response['current']['wind_direction_10m'] + 22.5) / 45) % 8]
-
-    # Pass location name and weather data to the template, including weather codes
-    return render_template('weather.html', location=location.capitalize(), weather=weather_response)
+    if latest_stocks is None:
+        return "Stock data is not available yet. Please try again later."
+    return render_template('stocks.html', stock_prices=latest_stocks['stock_prices'], sp500_graph=latest_stocks['sp500_graph'], sp500_change=latest_stocks['sp500_change'], time_until_refresh=time_remaining)
 
 @app.route('/')
 def index():
-    # Call async function synchronously using asyncio.run
     return render_template('index.html')
-
-@app.route('/weather')
-def weather():
-    # Call async function synchronously using asyncio.run
-    return asyncio.run(location_weather('boston'))
-
-@app.route('/stocks')
-def stocks():
-    stock_symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
-    stock_prices = get_stock_prices(stock_symbols)
-
-    sp500_data = fetch_sp500_data()
-    sp500_graph = get_sp500_graph(sp500_data)
-    sp500_change = get_sp500_change(sp500_data)
-    print(sp500_change)
-
-    return render_template('stocks.html', stock_prices=stock_prices, sp500_graph=sp500_graph, sp500_change=sp500_change)
 
 @app.route('/news')
 def news():
     return render_template('news.html')
 
-
 @app.route('/fifa')
 def fifa():
     return render_fifa()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+async def check_update():
+    global time_remaining
+    time_remaining = time_until_next_refresh()
+    print("Update time remaining: " + str(time_remaining)[:7])
+    if time_remaining.total_seconds() <= 0:
+        await update_data()
+        time_remaining = refresh_interval
+    return time_remaining
+
+# Start the background task to update data and run the app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+

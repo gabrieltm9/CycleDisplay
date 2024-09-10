@@ -7,17 +7,17 @@ import base64
 # Use 'Agg' backend to avoid GUI issues with matplotlib
 plt.switch_backend('Agg')
 
-# Function to get stock prices
+# Function to get stock prices for multiple symbols in a single call
 def get_stock_prices(symbols):
-    stock_data = []
-    for symbol in symbols:
-        stock = yf.Ticker(symbol)
-        # Use .iloc[0] to access the first row by position
-        price = stock.history(period="1d")['Close'].iloc[0]
-        stock_data.append({'symbol': symbol, 'price': price})
-    return stock_data
+    # Download data for multiple symbols over a single day
+    stock_data = yf.download(symbols, period="1d")['Close']
+    
+    # Prepare a list of dictionaries with symbol and its price
+    stock_prices = [{'symbol': symbol, 'price': round(stock_data[symbol].iloc[0], 2)} for symbol in symbols]
+    
+    return stock_prices
 
-# Function to fetch the S&P 500 data for the past 5 days
+# Function to fetch the S&P 500 data for the past 5 days (only fetched once)
 def fetch_sp500_data():
     sp500 = yf.Ticker("^GSPC")
     sp500_data = sp500.history(period="5d")  # Fetch past 5 days' data
