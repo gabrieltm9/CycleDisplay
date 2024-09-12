@@ -8,6 +8,7 @@ from weather import get_weather, celcius_to_fahrenheit
 
 app = Flask(__name__)
 
+# ----------------------- Data -----------------------
 # Global variables to store the latest data and time of the last update
 latest_weather = None
 latest_stocks = None
@@ -27,11 +28,11 @@ async def update_data():
 
         # Fetch weather for a hardcoded location (e.g., 'boston')
         latest_weather = await get_weather('boston')
-        latest_weather['current']['temperature_2m'] = celcius_to_fahrenheit(latest_weather['current']['temperature_2m'])
-        latest_weather['daily']['temperature_2m_max'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_max'])
-        latest_weather['daily']['temperature_2m_min'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_min'])
-        latest_weather['daily']['sunrise'][0] = datetime.strptime(latest_weather['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
-        latest_weather['daily']['sunset'][0] = datetime.strptime(latest_weather['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%H:%M')
+        latest_weather['current']['temperature_2m_f'] = celcius_to_fahrenheit(latest_weather['current']['temperature_2m'])
+        latest_weather['daily']['temperature_2m_max_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_max'])
+        latest_weather['daily']['temperature_2m_min_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_min'])
+        latest_weather['daily']['sunrise'][0] = datetime.strptime(latest_weather['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
+        latest_weather['daily']['sunset'][0] = datetime.strptime(latest_weather['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
         wind_directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
         latest_weather['current']['wind_direction_10m'] = wind_directions[int((latest_weather['current']['wind_direction_10m'] + 22.5) / 45) % 8]
         
@@ -53,52 +54,7 @@ async def update_data():
     except Exception as e:
         print(f"Error updating data: {e}")
         
-
-# Function to calculate the time until the next refresh
-def time_until_next_refresh():
-    global time_remaining
-    if last_update_time is None:
-        return timedelta(seconds=0)
-    time_remaining = last_update_time + refresh_interval - datetime.now()
-    return time_remaining
-
-# Route to return the weather page using the cached weather data
-@app.route('/weather')
-async def weather():
-    global latest_weather
-    time_remaining = await check_update()
-
-    if latest_weather is None:
-        return "Weather data is not available yet. Please try again later."
-    return render_template('weather.html', location='Boston', weather=latest_weather, time_until_refresh=time_remaining)
-
-# Route to return the stocks page using the cached stock data
-@app.route('/stocks')
-async def stocks():
-    global latest_stocks
-    time_remaining = await check_update()
-    
-    if latest_stocks is None:
-        return "Stock data is not available yet. Please try again later."
-    return render_template('stocks.html', stock_prices=latest_stocks['stock_prices'], sp500_graph=latest_stocks['sp500_graph'], sp500_change=latest_stocks['sp500_change'], time_until_refresh=time_remaining)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/news')
-def news():
-    return render_template('news.html')
-
-@app.route('/fifa')
-def fifa():
-    return render_fifa()
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
+# Function to check if an update is needed and update the data
 async def check_update():
     global time_remaining
     time_remaining = time_until_next_refresh()
@@ -108,7 +64,67 @@ async def check_update():
         time_remaining = refresh_interval
     return time_remaining
 
+# Function to calculate the time until the next refresh
+def time_until_next_refresh():
+    global time_remaining
+    if last_update_time is None:
+        return timedelta(seconds=0)
+    time_remaining = last_update_time + refresh_interval - datetime.now()
+    return time_remaining
+
+# Inject the weather data and time remaining into the context for all templates
+@app.context_processor
+def inject_data():
+    global latest_weather, time_remaining
+    current_time = datetime.now().strftime('%I:%M %p')
+    return {'weather': latest_weather, 'time_until_refresh': time_remaining, 'current_time': current_time}
+
+# ----------------------- Index -----------------------
+@app.route('/')
+async def index():
+    await check_update()
+
+    if latest_weather is None:
+        return "Weather data is not available. Please try again later."
+    return render_template('index.html')
+
+# ----------------------- Weather -----------------------
+# Route to return the weather page using the cached weather data
+@app.route('/weather')
+async def weather():
+    await check_update()
+
+    if latest_weather is None:
+        return "Weather data is not available. Please try again later."
+    return render_template('weather.html', location='Boston')
+
+# ----------------------- Stocks -----------------------
+# Route to return the stocks page using the cached stock data
+@app.route('/stocks')
+async def stocks():
+    global latest_stocks
+    await check_update()
+    
+    if latest_stocks is None:
+        return "Stock data is not available yet. Please try again later."
+    return render_template('stocks.html', stock_prices=latest_stocks['stock_prices'], sp500_graph=latest_stocks['sp500_graph'], sp500_change=latest_stocks['sp500_change'])
+
+# ----------------------- News -----------------------
+@app.route('/news')
+def news():
+    return render_template('news.html')
+
+# ----------------------- Fifa -----------------------
+@app.route('/fifa')
+def fifa():
+    return render_fifa()
+
+# ----------------------- Misc -----------------------
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 # Start the background task to update data and run the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-

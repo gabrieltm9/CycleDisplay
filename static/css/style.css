@@ -18,7 +18,7 @@ body {
     min-height: 100vh;
 }
 
-#current-temp {
+#weather-temp {
     font-size: 4.5rem;
     font-weight: bold;
     color: #333;
@@ -43,4 +43,31 @@ img.img-fluid {
 
 h6 {
     font-weight: bold;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #343a40; /* Darker background */
+    color: #ffffff;           /* White text */
+    padding: 20px !important; /* Padding for breathing room */
+    font-size: 1.6rem;        /* Slightly larger font */
+    border-top: 2px solid #495057; /* Border to separate the footer from the content */
+}
+
+.footer .d-flex {
+    align-items: center; /* Vertically center the items in the footer */
+}
+
+.footer .d-flex-inner {
+    display: flex !important;
+    justify-content: space-between;
+    width: 75%;
+}
+
+#current-time {
+    font-size: 2.1rem; /* Larger time display */
+}
+
+#weather-icon {
+    margin-right: 10px; /* Space between icon and text */
 }

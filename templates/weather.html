@@ -6,7 +6,7 @@
     <div class="col-md-6 text-center">
       <h2>{{ location }}</h2>
       <img id="weather-icon" src="" alt="Weather Icon" height="120" class="img-fluid mb-4">
-      <h1 id="current-temp" class="display-1">{{ weather['current']['temperature_2m'] }}°F</h1>
+      <h1 id="weather-temp" class="display-1">{{ weather['current']['temperature_2m_f'] }}°F</h1>
       <p class="mb-4" id="weather-desc">Weather Code: {{ weather['current']['weather_code'] }}</p>
       <div class="d-flex justify-content-around mb-4">
         <div>
@@ -33,7 +33,7 @@
         <div class="col text-center">
           <p>{{ weather['daily']['time'][i] }}</p>
           <img id="forecast-icon-{{i}}" src="" alt="Weather Icon" height="48" class="img-fluid">
-          <p><span>{{ weather['daily']['temperature_2m_max'][i] }}°F</span> / <span>{{ weather['daily']['temperature_2m_min'][i] }}°F</span></p>
+          <p><span>{{ weather['daily']['temperature_2m_max_f'][i] }}°F</span> / <span>{{ weather['daily']['temperature_2m_min_f'][i] }}°F</span></p>
         </div>
         {% endfor %}
       </div>
