@@ -128,4 +128,4 @@ def favicon():
 # Start the background task to update data and run the app
 if __name__ == '__main__':
     context = ('origin.pem', 'privkey.pem') #certificate and key files
-    app.run(debug=True, ssl_context=context)
+    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=context)
