@@ -1,7 +1,7 @@
 let cycle = true;
 let cycleTime = 15000;
 
-let pages = ['/stocks', '/news', '/fifa']; // Removed '/weather'
+let pages = ['/stocks', '/news']; // Removed '/weather'
 let currentPage = -1;
 
 // Function to load a page and its associated script
