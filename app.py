@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, redirect
 import asyncio
 from datetime import datetime, timedelta
 from fifa import render_fifa
@@ -88,6 +88,10 @@ async def index():
         return "Weather data is not available. Please try again later."
     return render_template('index.html')
 
+@app.route('/cycle')
+def cycle():
+    return redirect('/')
+
 # ----------------------- Weather -----------------------
 # Route to return the weather page using the cached weather data
 @app.route('/weather')
@@ -118,6 +122,11 @@ def news():
 @app.route('/fifa')
 def fifa():
     return render_fifa()
+
+# ----------------------- Dashboard -----------------------
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 # ----------------------- Misc -----------------------
 @app.route('/favicon.ico')

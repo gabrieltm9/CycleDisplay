@@ -136,3 +136,9 @@ function setContent() {
 }
 
 window.setContent = setContent;
+
+window.addEventListener('storage', function(e) {
+    if (e.key === 'newPage' && e.newValue) {
+      window.location.href = e.newValue;
+    }
+  });

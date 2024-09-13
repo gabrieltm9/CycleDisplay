@@ -1,0 +1,24 @@
+{% block content %}
+<title>Cycle Display Dashboard</title>
+
+<!-- jQuery (load this first) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap (load this after jQuery) -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Your Custom CSS -->
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div>
+    <h1>Dashboard</h1>
+    <div>
+        <button class="btn btn-primary" onclick="changePage('cycle')">Cycle</button>
+        <button class="btn btn-primary" onclick="changePage('weather')">Weather</button>
+        <button class="btn btn-primary" onclick="changePage('stocks')">Stocks</button>
+        <button class="btn btn-primary" onclick="changePage('news')">News</button>
+    </div>
+</div>
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}
