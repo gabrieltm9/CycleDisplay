@@ -1,12 +1,60 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/news.css') }}">
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="row">
-    <div class="col-12 text-center">
-        <h1>News</h1>
-        <ul>
-            <li>Breaking News: Something happened!</li>
-            <li>Market News: Stocks are up!</li>
-        </ul>
+<div class="news-container">
+    <!-- Global News Row -->
+    <div class="row-title">Global News</div>
+    <div class="row news-grid">
+        {% for article in news_data.global %}
+        <div class="col news-card">
+            <div class="card">
+                {% if article.urlToImage %}
+                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.source.name }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Business News Row -->
+    <div class="row-title">Business News</div>
+    <div class="row news-grid">
+        {% for article in news_data.business %}
+        <div class="col news-card">
+            <div class="card h-100">
+                {% if article.urlToImage %}
+                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.source.name }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Technology News Row -->
+    <div class="row-title">Technology News</div>
+    <div class="row news-grid">
+        {% for article in news_data.technology %}
+        <div class="col news-card">
+            <div class="card h-100">
+                {% if article.urlToImage %}
+                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.source.name }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

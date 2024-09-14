@@ -1,0 +1,72 @@
+/* Container to take full width with padding and small margins */
+.news-container {
+    padding: 10px;
+    max-width: 100vw;
+    margin: 0 auto;
+    height: 98.5vh;
+}
+
+/* Title for each row */
+.row-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 4px;
+    margin-left: 5px;
+}
+
+/* Create 6 columns per row for articles */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);  /* 6 cards per row */
+    margin-bottom: 12px;
+}
+
+/* Smaller card size */
+.news-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make the card fill the available height */
+.news-card .card {
+    height: 100%;
+    padding: 10px;
+}
+
+/* Restrict image height and keep aspect ratio */
+.card-img-top {
+    max-height: 100px;  /* Reduced image height */
+    object-fit: cover;
+}
+
+/* Card body styling */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    font-size: 0.9em;  /* Smaller text to fit more content */
+    padding: 10px 15px 5px 15px !important;
+}
+
+.card-title {
+    display: -webkit-box;
+
+    /* Limit to 4 lines */
+    line-clamp: 4;
+    -webkit-line-clamp: 4;  
+
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-text {
+    font-size: medium;
+}
+
+/* Remove scroll behavior */
+body {
+    overflow: hidden;  /* Disable scrolling */
+}

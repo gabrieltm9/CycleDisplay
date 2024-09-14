@@ -1,0 +1,89 @@
+/* General container styling to centralize and provide padding */
+.stock-container {
+    padding: 40px;
+    padding-top: 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    width: 60vw;
+    height: 80vh;
+    margin-bottom: 96.6px;
+}
+
+.page-title {
+    font-size: 3rem; /* Increase the font size */
+    padding-top: 160px;
+    padding-bottom: 100px;
+    margin: 0;
+    color: #333;
+}
+
+/* Section titles */
+.section-title {
+    font-size: 2.5rem; /* Make titles larger */
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.watchlist-container {
+    width: min-content;
+    height: 100%;
+}
+
+/* Stock list styling */
+.stock-list {
+    list-style: none;
+    padding: 0;
+    font-size: 1.5rem; /* Increase the font size */
+}
+
+.stock-item {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.stock-logo {
+    width: 30px;  /* Larger size for logos */
+    height: 30px;
+    margin-right: 10px;
+}
+
+/* Bold the stock names only */
+.stock-name {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Regular font-weight for stock prices */
+.stock-price {
+    font-weight: normal;
+}
+
+.sp-container {
+    height: 100%;
+    min-width: 750px;
+}
+
+/* Graph image styling */
+.img-graph {
+    width: auto;
+    height: 100%;
+    margin: 0 auto 5px;
+}
+
+/* Default S&P 500 change styling */
+.sp500-change {
+    font-size: 1.75rem;
+    margin-top: 15px;
+    color: red;
+    font-weight: bold;
+}
+
+/* Turn the numbers green when the absolute change is positive */
+.sp500-change.positive-change {
+    color: green;
+}

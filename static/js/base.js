@@ -1,7 +1,7 @@
 let cycle = true;
-let cycleTime = 15000;
+let cycleTime = 20000;
 
-let pages = ['/stocks', '/news']; // Removed '/weather'
+let pages = ['/stocks', '/news']; // Doesnt include weather or fifa
 let currentPage = -1;
 
 // Function to load a page and its associated script

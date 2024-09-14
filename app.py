@@ -2,9 +2,11 @@ import os
 from flask import Flask, render_template, send_from_directory, redirect
 import asyncio
 from datetime import datetime, timedelta
-from fifa import render_fifa
-from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
+
 from weather import get_weather, celcius_to_fahrenheit
+from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
+from news import fetch_all_news
+from fifa import render_fifa
 
 app = Flask(__name__)
 
@@ -12,13 +14,15 @@ app = Flask(__name__)
 # Global variables to store the latest data and time of the last update
 latest_weather = None
 latest_stocks = None
+latest_news = None
+
 last_update_time = None
 time_remaining = timedelta(0)
 refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 
 # Async function to fetch and update weather and stock data
 async def update_data():
-    global latest_weather, latest_stocks, last_update_time, time_remaining, refresh_interval
+    global latest_weather, latest_stocks, latest_news, last_update_time, time_remaining, refresh_interval
     stock_symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
     try:
         # Update the last update time
@@ -51,6 +55,10 @@ async def update_data():
 
         ibm_price = next(item['price'] for item in stock_prices if item['symbol'] == 'IBM')
         print("Stock data updated successfully! IBM: " + str(ibm_price))
+
+        # Fetch news articles
+        latest_news = fetch_all_news()
+        print("News data updated successfully! Articles: " + str(len(latest_news)))
     except Exception as e:
         print(f"Error updating data: {e}")
         
@@ -115,8 +123,13 @@ async def stocks():
 
 # ----------------------- News -----------------------
 @app.route('/news')
-def news():
-    return render_template('news.html')
+async def news():
+    global latest_news
+    await check_update()
+
+    if latest_news is None:
+        return "News data is not available yet. Please try again later."
+    return render_template('news.html', news_data=latest_news)
 
 # ----------------------- Fifa -----------------------
 @app.route('/fifa')
