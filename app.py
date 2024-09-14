@@ -23,7 +23,7 @@ refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 # Async function to fetch and update weather and stock data
 async def update_data():
     global latest_weather, latest_stocks, latest_news, last_update_time, time_remaining, refresh_interval
-    stock_symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
+    stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META']  # stock symbols
     try:
         # Update the last update time
         last_update_time = datetime.now()

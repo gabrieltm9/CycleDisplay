@@ -7,13 +7,22 @@ import base64
 # Use 'Agg' backend to avoid GUI issues with matplotlib
 plt.switch_backend('Agg')
 
-# Function to get stock prices for multiple symbols in a single call
+# Function to get stock prices and percentage change over the past 5 days for multiple symbols
 def get_stock_prices(symbols):
-    # Download data for multiple symbols over a single day
-    stock_data = yf.download(symbols, period="1d")['Close']
+    # Download data for multiple symbols over the past 5 days
+    stock_data = yf.download(symbols, period="5d")['Close']
     
-    # Prepare a list of dictionaries with symbol and its price
-    stock_prices = [{'symbol': symbol, 'price': round(stock_data[symbol].iloc[0], 2)} for symbol in symbols]
+    # Prepare a list of dictionaries with symbol, its price, and the percentage change
+    stock_prices = []
+    for symbol in symbols:
+        start_price = stock_data[symbol].iloc[0]
+        end_price = stock_data[symbol].iloc[-1]
+        percentage_change = ((end_price - start_price) / start_price) * 100
+        stock_prices.append({
+            'symbol': symbol, 
+            'price': round(end_price, 2), 
+            'percentage_change': round(percentage_change, 2)
+        })
     
     return stock_prices
 

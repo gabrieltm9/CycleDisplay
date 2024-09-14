@@ -13,6 +13,9 @@
                 <img src="https://assets.parqet.com/logos/symbol/{{ stock.symbol }}?format=png" alt="{{ stock.symbol }} logo" class="stock-logo">
                 <span class="stock-name">{{ stock.symbol }}:</span>
                 <span class="stock-price">${{ stock.price | round(2) }}</span>
+                <span class="stock-percentage {% if stock.percentage_change > 0 %}positive-change{% else %}negative-change{% endif %}">
+                    ({{ stock.percentage_change }}%)
+                </span>
             </li>
             {% endfor %}
         </ul>
@@ -23,7 +26,7 @@
         <h1 class="section-title" style="margin-bottom: 20px;">S&P 500</h1>
         <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="img-graph">
         <div class="sp500-change {% if sp500_change[0] > 0 %}positive-change{% endif %}">
-            <span>{{ sp500_change[0] | round(2) }}</span> | <span>{{ sp500_change[1] | round(2) }}%</span>
+            <span>{{ sp500_change[0] | round(2) }}</span> <span>({{ sp500_change[1] | round(2) }}%)</span>
         </div>
     </div>
 </div>

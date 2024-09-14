@@ -1,4 +1,4 @@
-/* General container styling to centralize and provide padding */
+/* General container styling */
 .stock-container {
     padding: 40px;
     padding-top: 0px;
@@ -13,7 +13,7 @@
 }
 
 .page-title {
-    font-size: 3rem; /* Increase the font size */
+    font-size: 3rem;
     padding-top: 160px;
     padding-bottom: 100px;
     margin: 0;
@@ -22,7 +22,7 @@
 
 /* Section titles */
 .section-title {
-    font-size: 2.5rem; /* Make titles larger */
+    font-size: 2.5rem;
     margin-bottom: 30px;
     color: #333;
 }
@@ -36,7 +36,7 @@
 .stock-list {
     list-style: none;
     padding: 0;
-    font-size: 1.5rem; /* Increase the font size */
+    font-size: 1.5rem;
 }
 
 .stock-item {
@@ -47,20 +47,32 @@
 }
 
 .stock-logo {
-    width: 30px;  /* Larger size for logos */
+    width: 30px;
     height: 30px;
     margin-right: 10px;
 }
 
-/* Bold the stock names only */
 .stock-name {
     font-weight: bold;
     margin-right: 5px;
 }
 
-/* Regular font-weight for stock prices */
 .stock-price {
     font-weight: normal;
+    margin-right: 10px;
+}
+
+/* Percentage change styling for positive and negative values */
+.stock-percentage {
+    font-weight: bold;
+}
+
+.positive-change {
+    color: green;
+}
+
+.negative-change {
+    color: red;
 }
 
 .sp-container {
@@ -83,7 +95,7 @@
     font-weight: bold;
 }
 
-/* Turn the numbers green when the absolute change is positive */
+/* Green color for positive change */
 .sp500-change.positive-change {
     color: green;
 }
