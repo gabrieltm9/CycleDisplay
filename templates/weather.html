@@ -7,7 +7,8 @@
       <h2>{{ location }}</h2>
       <img id="weather-icon" src="" alt="Weather Icon" height="120" class="img-fluid mb-4">
       <h1 id="weather-temp" class="display-1">{{ weather['current']['temperature_2m_f'] }}°F</h1>
-      <p class="mb-4" id="weather-desc">Weather Code: {{ weather['current']['weather_code'] }}</p>
+      <p class="mb-4" id="weather-desc">Weather Description</p>
+      <p class="mb-4" id="weather-code" style="display: block;">Weather Code: {{ weather['current']['weather_code'] }}</p>
       <div class="d-flex justify-content-around mb-4">
         <div>
           <img src="https://basmilius.github.io/weather-icons/production/fill/all/thermometer.svg" alt="Feels Like" height="48">
