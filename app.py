@@ -1,11 +1,10 @@
 import os
 from flask import Flask, render_template, send_from_directory, redirect
-import asyncio
 from datetime import datetime, timedelta
 
 from weather import get_weather, celcius_to_fahrenheit
 from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
-from news import fetch_all_news
+from news import fetch_news
 from fifa import render_fifa
 
 app = Flask(__name__)
@@ -57,19 +56,26 @@ async def update_data():
         print("Stock data updated successfully! IBM: " + str(ibm_price))
 
         # Fetch news articles
-        latest_news = fetch_all_news()
-        print("News data updated successfully! Articles: " + str(len(latest_news)))
+        news = fetch_news()
+        if news:
+            latest_news = news
+            print("News data updated successfully! Articles: " + str(len(latest_news)))
+        else:
+            print("No news articles fetched.")
     except Exception as e:
         print(f"Error updating data: {e}")
-        
+
 # Function to check if an update is needed and update the data
 async def check_update():
     global time_remaining
     time_remaining = time_until_next_refresh()
-    print("Update time remaining: " + str(time_remaining)[:7])
     if time_remaining.total_seconds() <= 0:
+        print("Time to update data!")
         await update_data()
         time_remaining = refresh_interval
+    else:
+        print("Update time remaining: " + str(time_remaining)[:7])
+
     return time_remaining
 
 # Function to calculate the time until the next refresh

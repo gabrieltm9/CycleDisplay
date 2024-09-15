@@ -19,13 +19,17 @@
 .news-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);  /* 6 cards per row */
+    grid-template-rows: repeat(3, 1fr);  /* 3 rows */
     margin-bottom: 12px;
 }
+
 
 /* Smaller card size */
 .news-card {
     display: flex;
     flex-direction: column;
+    min-width: 300px;
+    margin-bottom: 15px;
 }
 
 /* Make the card fill the available height */
@@ -62,8 +66,25 @@
     text-overflow: ellipsis;
 }
 
-.card-text {
-    font-size: medium;
+/* Container for URL and publish date */
+.card-text-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 10px;
+}
+
+/* Center the URL */
+.card-text.url {
+    text-align: left;
+    margin-bottom: 0px;
+}
+
+/* Right-align the publish date */
+.card-text.date {
+    text-align: right;
+    white-space: nowrap;  /* Prevent the date from wrapping */
 }
 
 /* Remove scroll behavior */

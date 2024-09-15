@@ -3,54 +3,21 @@
 
 {% block content %}
 <div class="news-container">
-    <!-- Global News Row -->
-    <div class="row-title">Global News</div>
+    <!-- News -->
+    <div class="row-title">News</div>
     <div class="row news-grid">
-        {% for article in news_data.global %}
+        {% for article in news_data %}
         <div class="col news-card">
             <div class="card">
-                {% if article.urlToImage %}
-                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
+                {% if article.image %}
+                <img src="{{ article.image }}" class="card-img-top" alt="Image for {{ article.title }}">
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ article.title }}</h5>
-                    <p class="card-text">{{ article.source.name }}</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Business News Row -->
-    <div class="row-title">Business News</div>
-    <div class="row news-grid">
-        {% for article in news_data.business %}
-        <div class="col news-card">
-            <div class="card h-100">
-                {% if article.urlToImage %}
-                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ article.title }}</h5>
-                    <p class="card-text">{{ article.source.name }}</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Technology News Row -->
-    <div class="row-title">Technology News</div>
-    <div class="row news-grid">
-        {% for article in news_data.technology %}
-        <div class="col news-card">
-            <div class="card h-100">
-                {% if article.urlToImage %}
-                <img src="{{ article.urlToImage }}" class="card-img-top" alt="Image for {{ article.title }}">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ article.title }}</h5>
-                    <p class="card-text">{{ article.source.name }}</p>
+                    <div class="card-text-container">
+                        <p class="card-text url">{{ article.url }}</p>
+                        <p class="card-text date">{{ article.publish_date }}</p>
+                    </div>
                 </div>
             </div>
         </div>
