@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import worldnewsapi
 
-API_KEY = '8d4703a418d6437da131b5f880130926'
+API_KEY = '5e8a501ccb92426fb49ef31c4b209816'
 
 configuration = worldnewsapi.Configuration(
     host = "https://api.worldnewsapi.com"
@@ -16,6 +16,32 @@ time_between_fetches = timedelta(minutes=60)
 
 max_articles_per_source = 4
 number_of_articles = 18
+
+# Blacklist words in the title to reduce spam
+blacklist_words = ['wordle']
+blacklist_sports = [
+    "lakers",
+    "yankees",
+    "bulls",
+    "cowboys",
+    "warriors",
+    "knicks",
+    "dodgers",
+    "packers",
+    "cubs",
+    "49ers",
+    "rams",
+    "eagles",
+    "rockets",
+    "steelers",
+    "seahawks",
+    "spurs",
+    "saints",
+    "broncos",
+    "pistons",
+]
+# Override blacklist if title contains any of these words
+whitelisted_words = ['red sox', 'celtics', 'bruins', 'patriots']
 
 def is_within_time_range():
     """Check if the current time is between start and end times."""
@@ -59,10 +85,10 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
         source_countries = 'us' # str | The ISO 3166 country code of the country for which top news should be retrieved.
         language = 'en' # str | The ISO 6391 language code of the top news. The language must be one spoken in the source-country.
         number = 100
-        news_sources = 'www.cnn.com,www.bloomberg.com,www.reuters.com,aljazeera.com,time.com,cnbc.com,www.pcgamer.com,www.forbes.com,bostonherald.com'
+        news_sources = 'www.cnn.com,www.bbc.co.uk,www.bloomberg.com,www.reuters.com,aljazeera.com,time.com,cnbc.com,www.pcgamer.com,www.forbes.com,bostonherald.com,techcrunch.com,arstechnica.com,scientificamerican.com'
 
-        # Earliest publish date today
-        start_date = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%d")
+        # Earliest publish date 12 hours ago
+        start_date = (datetime.now() - timedelta(hours=12)).strftime('%Y-%m-%d %H:%M:%S')
 
         try:
             # Top News
@@ -71,6 +97,9 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
 
             # Remove articles without an image
             news = [article for article in news if article.image]
+
+            # Remove articles with blacklisted words/sports in the title but not whitelisted words
+            news = [article for article in news if (not any(word in article.title.lower() for word in blacklist_words) and not any(sport in article.title.lower() for sport in blacklist_sports)) or any(word in article.title.lower() for word in whitelisted_words)]
 
             # Organize articles by source (domain)
             articles_by_source = {}
@@ -95,7 +124,7 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
             # Sort articles by publish date again
             final_articles.sort(key=lambda x: x.publish_date, reverse=True)
 
-            # Replace publish date string with a formatted string showing time
+            # # Replace publish date string with a formatted string showing time
             for article in final_articles:
                 article.publish_date = datetime.strptime(article.publish_date, "%Y-%m-%d %H:%M:%S").strftime('%I:%M %p')
 

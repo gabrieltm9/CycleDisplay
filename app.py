@@ -17,7 +17,7 @@ latest_news = None
 
 last_update_time = None
 time_remaining = timedelta(0)
-refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
+refresh_interval = timedelta(minutes=1)  # Refresh every 5 minutes
 
 # Async function to fetch and update weather and stock data
 async def update_data():
