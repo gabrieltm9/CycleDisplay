@@ -18,7 +18,7 @@ max_articles_per_source = 4
 number_of_articles = 18
 
 # Blacklist words in the title to reduce spam
-blacklist_words = ['wordle', 'crossword']
+blacklist_words = ['wordle', 'crossword', 'hints and answers']
 blacklist_sports = [
     "lakers",
     "yankees",
