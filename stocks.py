@@ -27,7 +27,7 @@ def get_stock_prices(symbols):
             if len(close_prices) < 2:
                 continue
             start_price = close_prices[0]
-            end_price = close_prices[-1]
+            end_price = result['meta']['regularMarketPrice']
             percentage_change = ((end_price - start_price) / start_price) * 100
             stock_prices.append({
                 'symbol': symbol,

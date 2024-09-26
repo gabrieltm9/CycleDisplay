@@ -116,7 +116,7 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
 
             # Ensure each source has at most 'max_articles_per_source' articles
             filtered_news = []
-            for source, articles in articles_by_source.items():
+            for articles in articles_by_source.items():
                 filtered_news.extend(articles[:max_articles_per_source])
             
             final_articles = filtered_news[:number_of_articles]
