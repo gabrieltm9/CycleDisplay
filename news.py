@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import worldnewsapi
 
-API_KEY = '5e8a501ccb92426fb49ef31c4b209816'
+API_KEY = 'bf01da6925de41fb9ec675822593a52a'
 
 configuration = worldnewsapi.Configuration(
     host = "https://api.worldnewsapi.com"
