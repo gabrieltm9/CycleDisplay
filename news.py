@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import worldnewsapi
 
-API_KEY = '58a501ccb92426fb49ef31c4b209816'
+API_KEY = 'f65c1ffb3c8f4f4e95c0b5a4faac4b67'
 
 configuration = worldnewsapi.Configuration(
     host = "https://api.worldnewsapi.com"
@@ -12,7 +12,7 @@ configuration.api_key['apiKey'] = API_KEY
 last_api_call = None  # This will store the last time the API call was made
 start_fetch = '06:00'
 end_fetch = '22:00'
-time_between_fetches = timedelta(minutes=60)
+time_between_fetches = timedelta(hours=1)
 
 max_articles_per_source = 4
 number_of_articles = 18
@@ -101,32 +101,37 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
             # Remove articles with blacklisted words/sports in the title but not whitelisted words
             news = [article for article in news if (not any(word in article.title.lower() for word in blacklist_words) and not any(sport in article.title.lower() for sport in blacklist_sports)) or any(word in article.title.lower() for word in whitelisted_words)]
 
+            # Remove articles with no publish date
+            news = [article for article in news if article.publish_date]
+
             # Organize articles by source (domain)
             articles_by_source = {}
             for article in news:
                 # Extract the source (domain) from the URL
-                article.url = article.url.split('/')[2].replace('www.', '').split('.')[0]
-                if article.url not in articles_by_source:
-                    articles_by_source[article.url] = []
-                articles_by_source[article.url].append(article)
+                source_domain = article.url.split('/')[2].replace('www.', '').split('.')[0]
+                article.url = source_domain
+                if source_domain not in articles_by_source:
+                    articles_by_source[source_domain] = []
+                articles_by_source[source_domain].append(article)
 
             # Print the number of articles by source
             sources = {source: len(articles) for source, articles in articles_by_source.items()}
             print('Fetched sources: ', sources)
 
             # Ensure each source has at most 'max_articles_per_source' articles
-            filtered_news = []
-            for articles in articles_by_source.items():
-                filtered_news.extend(articles[:max_articles_per_source])
+            final_articles = []
+            for source, articles in articles_by_source.items():
+                final_articles.extend(articles[:max_articles_per_source])
             
-            final_articles = filtered_news[:number_of_articles]
+            # Limit the total number of articles to 'number_of_articles'
+            final_articles = final_articles[:number_of_articles]
 
-            # Sort articles by publish date again
+            # Sort articles by publish date
             final_articles.sort(key=lambda x: x.publish_date, reverse=True)
 
-            # # Replace publish date string with a formatted string showing time
+            # Replace publish date string with a formatted string showing time
             for article in final_articles:
-                article.publish_date = datetime.strptime(article.publish_date, "%Y-%m-%d %H:%M:%S").strftime('%I:%M %p')
+                article.publish_date = datetime.strptime(article.publish_date, '%Y-%m-%d %H:%M:%S').strftime('%I:%M %p')
 
             last_api_call = datetime.now()
             return final_articles
