@@ -10,34 +10,35 @@ import datetime
 plt.switch_backend('Agg')
 
 # Function to get stock prices and percentage change over the past 5 days for multiple symbols
+import requests
+
 def get_stock_prices(symbols):
-    # Prepare a list of dictionaries with symbol, its price, and the percentage change
     stock_prices = []
     for symbol in symbols:
         url = f'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         }
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        try:
-            result = data['chart']['result'][0]
-            timestamps = result['timestamp']
-            close_prices = result['indicators']['quote'][0]['close']
-            if len(close_prices) < 2:
+        with requests.get(url, headers=headers) as response:  # Ensures connection is closed after request
+            data = response.json()
+            try:
+                result = data['chart']['result'][0]
+                timestamps = result['timestamp']
+                close_prices = result['indicators']['quote'][0]['close']
+                if len(close_prices) < 2:
+                    continue
+                start_price = close_prices[0]
+                end_price = result['meta']['regularMarketPrice']
+                percentage_change = ((end_price - start_price) / start_price) * 100
+                stock_prices.append({
+                    'symbol': symbol,
+                    'price': round(end_price, 2),
+                    'percentage_change': round(percentage_change, 2)
+                })
+            except (KeyError, IndexError, TypeError):
                 continue
-            start_price = close_prices[0]
-            end_price = result['meta']['regularMarketPrice']
-            percentage_change = ((end_price - start_price) / start_price) * 100
-            stock_prices.append({
-                'symbol': symbol,
-                'price': round(end_price, 2),
-                'percentage_change': round(percentage_change, 2)
-            })
-        except (KeyError, IndexError, TypeError):
-            # Handle error or skip this symbol
-            continue
     return stock_prices
+
 
 # Function to fetch the S&P 500 data for the past 5 days (only fetched once)
 def fetch_sp500_data():

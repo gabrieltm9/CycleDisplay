@@ -8,6 +8,7 @@ async def get_coordinates(city):
     async with aiohttp.ClientSession() as session:
         async with session.get(location_url) as response:
             location_response = await response.json()
+            session.close()
 
     if not location_response:
         return None, None  # Handle location not found
@@ -31,6 +32,7 @@ async def get_weather(location):
     async with aiohttp.ClientSession() as session:
         async with session.get(weather_url) as response:
             weather_response = await response.json()
+            session.close()
             return weather_response
 
 def celcius_to_fahrenheit(celcius):

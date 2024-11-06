@@ -10,16 +10,18 @@ recent_games_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLh
 head_to_head_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/gviz/tq?tqx=out:csv&range=M1:R6'
 total_goals_url = 'https://docs.google.com/spreadsheets/d/1AYi1eyzHwZgTCOccHKLhAGVMfaCqqgiePkdRtV1DdQY/gviz/tq?tqx=out:csv&range=M9:R14'
 
+
 def fetch_data(url):
     """Fetch CSV data from the Google Sheets shared URL."""
-    response = requests.get(url)
-    if response.status_code == 200:
-        df = pd.read_csv(io.BytesIO(response.content), sep=',')
-        df = df.fillna("")  # Replace all NaNs with empty strings
-        df = df.dropna(axis=1, how='all')  # Drop columns that are all NaN
-        return df
-    else:
-        raise Exception(f"Error fetching data from {url}")
+    with requests.get(url) as response:  # Ensures connection is closed after request
+        if response.status_code == 200:
+            df = pd.read_csv(io.BytesIO(response.content), sep=',')
+            df = df.fillna("")  # Replace all NaNs with empty strings
+            df = df.dropna(axis=1, how='all')  # Drop columns that are all NaN
+            return df
+        else:
+            raise Exception(f"Error fetching data from {url}")
+
 
 def render_fifa():
     # Fetch the data for recent games, head-to-head, and total goals
