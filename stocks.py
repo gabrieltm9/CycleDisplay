@@ -15,7 +15,7 @@ import requests
 def get_stock_prices(symbols):
     stock_prices = []
     for symbol in symbols:
-        url = f'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d'
+        url = f'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=2d'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         }
@@ -27,8 +27,8 @@ def get_stock_prices(symbols):
                 close_prices = result['indicators']['quote'][0]['close']
                 if len(close_prices) < 2:
                     continue
-                start_price = close_prices[0]
-                end_price = result['meta']['regularMarketPrice']
+                start_price = close_prices[-2]
+                end_price = close_prices[-1]
                 percentage_change = ((end_price - start_price) / start_price) * 100
                 stock_prices.append({
                     'symbol': symbol,
