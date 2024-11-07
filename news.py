@@ -82,7 +82,6 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
     with worldnewsapi.ApiClient(configuration) as api_client:
         # Create an instance of the API class
         api_instance = worldnewsapi.NewsApi(api_client)
-        source_countries = 'us' # str | The ISO 3166 country code of the country for which top news should be retrieved.
         language = 'en' # str | The ISO 6391 language code of the top news. The language must be one spoken in the source-country.
         number = 100
         news_sources = 'www.cnn.com,www.bbc.co.uk,www.bloomberg.com,www.reuters.com,aljazeera.com,time.com,cnbc.com,www.pcgamer.com,www.forbes.com,bostonherald.com,techcrunch.com,arstechnica.com,scientificamerican.com'
@@ -92,7 +91,7 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
 
         try:
             # Top News
-            api_response = api_instance.search_news(news_sources=news_sources, source_countries=source_countries, language=language, number=number, earliest_publish_date=start_date, sort_direction='desc')
+            api_response = api_instance.search_news(news_sources=news_sources, source_countries='us', language=language, number=number, earliest_publish_date=start_date, sort_direction='desc')
             news = api_response.news
 
             # Remove articles without an image
