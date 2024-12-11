@@ -51,7 +51,7 @@ h6 {
     background-color: #343a40; /* Darker background */
     color: #ffffff;           /* White text */
     padding: 20px !important; /* Padding for breathing room */
-    font-size: 1.6rem;        /* Slightly larger font */
+    font-size: 1.8rem;        /* Slightly larger font */
     border-top: 2px solid #495057; /* Border to separate the footer from the content */
 }
 
@@ -66,7 +66,7 @@ h6 {
 }
 
 #current-time {
-    font-size: 2.1rem; /* Larger time display */
+    font-size: 2.4rem; /* Larger time display */
 }
 
 #weather-icon {
