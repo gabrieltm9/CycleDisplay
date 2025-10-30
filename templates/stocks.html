@@ -7,7 +7,7 @@
     <!-- Stock Prices Section -->
     <div class="watchlist-container">
         <h1 class="section-title" style="margin-bottom: 3px;">Watchlist</h1>
-        <h4 style="font-size: 21px; margin-bottom: 20px;">Current Price | 1 Day % Change</h4>
+        <h3 class="sp-subtitle">Current Price (1-Day Change)</h3>
         <ul class="stock-list">
             {% for stock in stock_prices %}
             <li class="stock-item">
@@ -24,8 +24,11 @@
 
     <!-- S&P 500 Section -->
     <div class="sp-container col-lg-6 col-md-12 text-center">
-        <h1 class="section-title" style="margin-bottom: 20px;">S&P 500</h1>
-        <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="img-graph">
+        <h1 class="section-title" style="margin-bottom: 12px;">S&P 500</h1>
+        <h3 class="sp-subtitle" style="margin-bottom: 10px;">Past 5 Days</h3>
+        <div class="graph-wrapper">
+            <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="img-graph">
+        </div>
         <div class="sp500-change {% if sp500_change[0] > 0 %}positive-change{% endif %}">
             <span>{{ sp500_change[0] | round(2) }}</span> <span>({{ sp500_change[1] | round(2) }}%)</span>
         </div>

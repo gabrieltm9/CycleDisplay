@@ -19,12 +19,6 @@ body {
     min-height: 100vh;
 }
 
-#weather-temp {
-    font-size: 4.5rem;
-    font-weight: bold;
-    color: #333;
-}
-
 img.img-fluid {
     max-width: 100px;
 }
@@ -55,20 +49,35 @@ h6 {
     border-top: 2px solid #495057; /* Border to separate the footer from the content */
 }
 
-.footer .d-flex {
-    align-items: center; /* Vertically center the items in the footer */
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 32px;
 }
 
-.footer .d-flex-inner {
-    display: flex !important;
-    justify-content: space-between;
-    width: 75%;
+.footer-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 32px;
 }
+
+.footer-info .info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+}
+
+.footer-info .info-item span {
+    font-size: 2rem;
+}
+
 
 #current-time {
     font-size: 2.4rem; /* Larger time display */
-}
-
-#weather-icon {
-    margin-right: 10px; /* Space between icon and text */
 }

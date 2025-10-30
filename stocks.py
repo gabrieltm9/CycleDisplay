@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as mtick
 from io import BytesIO
 import base64
 import datetime
@@ -63,28 +64,52 @@ def fetch_sp500_data():
 # Function to generate S&P 500 graph with improved aesthetics
 def get_sp500_graph(sp500_data):
     # Plot the S&P 500 data with improved aesthetics
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.plot(sp500_data.index, sp500_data['Close'], label='S&P 500', color='blue', linewidth=2)
+    line_color = '#2563eb'
+    fill_color = '#2563eb'
+    values = sp500_data['Close']
+    fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
+    ax.plot(sp500_data.index, values, color=line_color, linewidth=2)
+    ax.fill_between(sp500_data.index, values, color=fill_color, alpha=0.08)
 
-    # Improve formatting
-    ax.set_title('S&P 500 Performance - Past 5 Days', fontsize=14, weight='bold')
-    ax.set_xlabel('Date', fontsize=12)
-    ax.set_ylabel('Price', fontsize=12)
-    
-    # Format the x-axis to show only day and month
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-    plt.xticks(rotation=45)
-    ax.grid(True)
-
+    # Apply minimalist styling that still keeps the chart readable in the dashboard
+    ax.set_facecolor('white')
     fig.patch.set_alpha(0)
+    ax.set_xlabel('Date', fontsize=11, color='#4b5563', labelpad=8)
+    ax.set_ylabel('Price', fontsize=11, color='#4b5563', labelpad=8)
+    ax.tick_params(axis='x', colors='#374151', labelsize=10, rotation=45)
+    ax.tick_params(axis='y', colors='#374151', labelsize=10)
+
+    ax.xaxis.set_major_locator(mdates.DayLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+
+    for spine in ('top', 'right'):
+        ax.spines[spine].set_visible(False)
+    for spine in ('left', 'bottom'):
+        ax.spines[spine].set_color('#d1d5db')
+        ax.spines[spine].set_linewidth(1)
+
+    ax.grid(axis='y', color='#e5e7eb', linewidth=0.8, alpha=0.8, linestyle='-')
+    ax.grid(False, axis='x')
+
+    # Fit the y-axis tightly around the data with a small visual buffer
+    y_min, y_max = values.min(), values.max()
+    if y_min == y_max:
+        pad = max(y_min * 0.01, 1)
+        ax.set_ylim(y_min - pad, y_max + pad)
+    else:
+        pad = (y_max - y_min) * 0.08
+        ax.set_ylim(y_min - pad, y_max + pad)
+
+    ax.margins(x=0.01)
 
     # Save the graph to a bytes buffer
     buf = BytesIO()
-    plt.tight_layout()  # Adjust the layout
-    plt.savefig(buf, format="png")
+    fig.savefig(buf, format="png", dpi=200, bbox_inches='tight')
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
+    plt.close(fig)
 
     return image_base64
 

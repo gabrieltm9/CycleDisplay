@@ -15,6 +15,7 @@
 
     <!-- Your Custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/weather.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -24,48 +25,51 @@
 
     <!-- Footer with weather, temperature, icon, humidity, and time -->
     <footer class="footer fixed-bottom bg-dark text-white p-3">
-        <div class="d-flex justify-content-between">
+        <div class="footer-content">
             <!-- Location and Weather Info -->
-            <div class="d-flex-inner">
+            <div class="footer-info">
                 <!-- Hidden weather code element for parsing in JS -->
                 <span id="weather-code" style="display: none">{{ weather['current']['weather_code'] }}</span>
                     
                 <!-- Weather -->
-                <div class="d-flex">
-                    <img id="weather-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day.svg" class="img-fluid" style="width: 55px; margin-right: 10px;">
+                <div class="info-item">
+                    <img id="weather-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day.svg" class="img-fluid" style="width: 55px;">
                     <span id="weather-desc">Partly Cloudy</span>
                 </div>
 
                 <!-- Temperature -->
-                <div class="d-flex">
+                <div class="info-item">
                     <img id="temp-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/thermometer.svg" class="img-fluid" style="width: 55px;">
                     <span id="current-temp-f">{{ weather['current']['temperature_2m_f'] }}°F /&nbsp</span>
                     <span id="current-temp-c">{{ weather['current']['temperature_2m'] }}°C</span>
                 </div>
 
                 <!-- Humidity -->
-                <div class="d-flex">
+                <div class="info-item">
                     <img id="humidity-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/humidity.svg" class="img-fluid" style="width: 55px;">
                     <span id="humidity">{{ weather['current']['relative_humidity_2m'] }}%</span>
                 </div>
 
                 <!-- Precipitation -->
-                <div class="d-flex">
+                <div class="info-item">
                     <img id="precipitation-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/raindrops.svg" class="img-fluid" style="width: 55px;">
                     <span id="precipitation">{{ weather['current']['precipitation'] }}mm</span>
                 </div>
 
                 <!-- Wind -->
-                <div class="d-flex">
+                <div class="info-item">
                     <img id="wind-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/wind.svg" class="img-fluid" style="width: 55px;">
                     <span id="wind">{{ weather['current']['wind_speed_10m'] }}km/h {{ weather['current']['wind_direction_10m'] }}</span>
                 </div>
 
-                <!-- Sunrise/sunset -->
-                <div class="d-flex">
+                <!-- Sunrise -->
+                <div class="info-item">
                     <img id="sunrise-icon" src="/static/icons/sunrise.svg" class="img-fluid" style="width: 55px;">
-                    <span id="sunrise" style="margin-right: 10px;">{{ weather['daily']['sunrise'][0] }}</span>
+                    <span id="sunrise">{{ weather['daily']['sunrise'][0] }}</span>
+                </div>
 
+                <!-- Sunset -->
+                <div class="info-item">
                     <img id="sunset-icon" src="/static/icons/sunset.svg" class="img-fluid" style="width: 55px;">
                     <span id="sunset">{{ weather['daily']['sunset'][0] }}</span>
                 </div>

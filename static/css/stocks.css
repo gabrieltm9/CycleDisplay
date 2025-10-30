@@ -3,19 +3,20 @@
     padding: 40px;
     padding-top: 0px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     text-align: center;
     margin: 0 auto;
-    width: 60vw;
-    height: 80vh;
-    margin-bottom: 96.6px;
+    width: 80vw;
+    height: 64vh;
+    margin-bottom: 160px;
+    font-size: 30px;
 }
 
 .page-title {
     font-size: 3rem;
-    padding-top: 160px;
-    padding-bottom: 100px;
+    padding-top: 80px;
+    padding-bottom: 40px;
     margin: 0;
     color: #333;
 }
@@ -30,17 +31,23 @@
 .watchlist-container {
     width: min-content;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Stock list styling */
 .stock-list {
     list-style: none;
     padding: 0;
+    margin: 0;
     font-size: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
 }
 
 .stock-item {
-    margin-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: start;
@@ -80,19 +87,42 @@
     min-width: 750px;
 }
 
-/* Graph image styling */
-.img-graph {
-    width: auto;
-    height: 100%;
-    margin: 0 auto 5px;
+.sp-subtitle {
+    font-size: 23px;
+    margin: 0 0 20px;
 }
 
-/* Default S&P 500 change styling */
+.graph-wrapper {
+    margin: 0 auto 10px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.img-graph {
+    width: 100%;
+    height: auto;
+    margin: 0;
+}
+
 .sp500-change {
-    font-size: 1.75rem;
     margin-top: 15px;
     color: red;
     font-weight: bold;
+}
+
+@media (max-width: 992px) {
+    .sp-container {
+        min-width: unset;
+    }
+
+    .graph-wrapper {
+        max-width: 100%;
+        max-height: 400px;
+    }
+
+    .img-graph {
+        transform: translateY(-50px);
+    }
 }
 
 /* Green color for positive change */

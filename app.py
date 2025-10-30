@@ -1,7 +1,7 @@
 import asyncio
 import gc
 import os
-from flask import Flask, render_template, send_from_directory, redirect
+from flask import Flask, render_template, redirect, send_from_directory
 from datetime import datetime, timedelta
 
 from weather import get_weather, celcius_to_fahrenheit
@@ -36,13 +36,19 @@ async def update_data():
 
             print(f"Updating data at {last_update_time}")
 
-            # Fetch weather for a hardcoded location (e.g., 'boston')
-            latest_weather = await get_weather('boston')
+            # Fetch weather for a hardcoded location (e.g., 'manhattan')
+            latest_weather = await get_weather('manhattan')
             latest_weather['current']['temperature_2m_f'] = celcius_to_fahrenheit(latest_weather['current']['temperature_2m'])
             latest_weather['daily']['temperature_2m_max_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_max'])
             latest_weather['daily']['temperature_2m_min_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_min'])
-            latest_weather['daily']['sunrise'][0] = datetime.strptime(latest_weather['daily']['sunrise'][0], '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
-            latest_weather['daily']['sunset'][0] = datetime.strptime(latest_weather['daily']['sunset'][0], '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
+            latest_weather['daily']['sunrise'] = [
+                datetime.strptime(sunrise, '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
+                for sunrise in latest_weather['daily']['sunrise']
+            ]
+            latest_weather['daily']['sunset'] = [
+                datetime.strptime(sunset, '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
+                for sunset in latest_weather['daily']['sunset']
+            ]
             wind_directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
             latest_weather['current']['wind_direction_10m'] = wind_directions[int((latest_weather['current']['wind_direction_10m'] + 22.5) / 45) % 8]
             
@@ -113,7 +119,7 @@ async def index():
     await check_update()
 
     if latest_weather is None:
-        return "Weather data is not available. Please try again later."
+        return "Data is not available yet :( Please try again later."
     return render_template('index.html')
 
 @app.route('/cycle')
@@ -128,7 +134,31 @@ async def weather():
 
     if latest_weather is None:
         return "Weather data is not available. Please try again later."
-    return render_template('weather.html', location='Boston')
+    daily_data = latest_weather['daily']
+    daily_forecast = []
+
+    for index, date_str in enumerate(daily_data['time'][:7]):
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            formatted_date = date_obj.strftime('%a %b %d')
+        except ValueError:
+            formatted_date = date_str
+
+        daily_forecast.append({
+            'date': formatted_date,
+            'code': daily_data.get('weather_code', [None] * len(daily_data['time']))[index],
+            'high_f': daily_data['temperature_2m_max_f'][index],
+            'low_f': daily_data['temperature_2m_min_f'][index],
+            'high_c': daily_data['temperature_2m_max'][index],
+            'low_c': daily_data['temperature_2m_min'][index],
+            'sunrise': daily_data['sunrise'][index],
+            'sunset': daily_data['sunset'][index],
+            'uv': daily_data['uv_index_max'][index],
+            'humidity': daily_data.get('relative_humidity_2m_max', [0] * len(daily_data['time']))[index],
+            'rain': daily_data.get('precipitation_sum', [0] * len(daily_data['time']))[index]
+        })
+
+    return render_template('weather.html', location='Manhattan', daily_forecast=daily_forecast)
 
 # ----------------------- Stocks -----------------------
 # Route to return the stocks page using the cached stock data
@@ -160,6 +190,11 @@ def fifa():
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+# ----------------------- Findmy -----------------------
+@app.route('/findmy')
+def findmy():
+    return send_from_directory(os.path.join(app.root_path, 'findmy', 'noVNC'), 'vnc.html')
 
 # ----------------------- Misc -----------------------
 @app.route('/favicon.ico')
