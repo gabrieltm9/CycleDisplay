@@ -7,7 +7,7 @@ function applyResponsiveScale() {
     const widthRatio = window.innerWidth / BASE_WIDTH;
     const heightRatio = window.innerHeight / BASE_HEIGHT;
     const scale = Math.min(widthRatio, heightRatio);
-    const clampedScale = Math.max(0.5, scale);
+    const clampedScale = Math.max(0.1, scale);
     document.documentElement.style.fontSize = `${BASE_FONT_SIZE * clampedScale}px`;
 }
 

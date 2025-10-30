@@ -8,13 +8,15 @@
       <div class="forecast-date">{{ day.date }}</div>
       <img class="forecast-icon" src="" alt="Weather icon">
       <div class="forecast-desc" data-forecast-desc>—</div>
-      <div class="forecast-temps">
-        <span class="temp-low">{{ day.low_c }}°C</span>
-        <span class="temp-high">{{ day.high_c }}°C</span>
-      </div>
-      <div class="forecast-temps-fahrenheit">
-        <span class="temp-low-fahrenheit">{{ day.low_f }}°F</span>
-        <span class="temp-high-fahrenheit">{{ day.high_f }}°F</span>
+      <div class="forecast-temps-container">
+        <div class="forecast-temps">
+          <span class="temp-low">{{ day.low_c }}°C</span>
+          <span class="temp-high">{{ day.high_c }}°C</span>
+        </div>
+        <div class="forecast-temps-fahrenheit">
+          <span class="temp-low-fahrenheit">{{ day.low_f }}°F</span>
+          <span class="temp-high-fahrenheit">{{ day.high_f }}°F</span>
+        </div>
       </div>
       <div class="forecast-meta">
         <span>Sunrise: {{ day.sunrise }}</span>

@@ -74,14 +74,14 @@ def get_sp500_graph(sp500_data):
     # Apply minimalist styling that still keeps the chart readable in the dashboard
     ax.set_facecolor('white')
     fig.patch.set_alpha(0)
-    ax.set_xlabel('Date', fontsize=11, color='#4b5563', labelpad=8)
-    ax.set_ylabel('Price', fontsize=11, color='#4b5563', labelpad=8)
+    ax.set_xlabel('')
+    ax.set_ylabel('')
     ax.tick_params(axis='x', colors='#374151', labelsize=10, rotation=45)
     ax.tick_params(axis='y', colors='#374151', labelsize=10)
 
     ax.xaxis.set_major_locator(mdates.DayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-    ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+    ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('${x:,.0f}'))
 
     for spine in ('top', 'right'):
         ax.spines[spine].set_visible(False)
@@ -101,7 +101,9 @@ def get_sp500_graph(sp500_data):
         pad = (y_max - y_min) * 0.08
         ax.set_ylim(y_min - pad, y_max + pad)
 
-    ax.margins(x=0.01)
+    # Set x-axis limits to align data points with days and remove margins
+    ax.set_xlim(sp500_data.index[0], sp500_data.index[-1])
+    ax.margins(x=0)
 
     # Save the graph to a bytes buffer
     buf = BytesIO()

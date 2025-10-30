@@ -25,7 +25,7 @@
     background-color: #ffffff;
     border-radius: 1rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
+    padding: 2rem 0rem;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -78,10 +78,17 @@
     margin-right: 0.625rem; /* Space between icon and text */
 }
 
+.forecast-temps-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .forecast-temps-fahrenheit {
     display: flex;
     gap: 0.7rem;
     font-size: 1.4rem;
     font-weight: 500;
     color: #212529;
+    justify-content: center;
 }
