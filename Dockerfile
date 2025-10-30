@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["hypercorn", "app:app", "--bind", "0.0.0.0:5000"]
+CMD [ "python", "./app.py" ]
