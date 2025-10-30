@@ -9,15 +9,7 @@ from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp50
 from news import fetch_news
 from fifa import render_fifa
 
-import asyncio, sys
-
-if sys.platform.startswith("linux"):
-    try:
-        loop = asyncio.get_event_loop()
-        if loop.is_closed():
-            asyncio.set_event_loop(asyncio.new_event_loop())
-    except RuntimeError:
-        asyncio.set_event_loop(asyncio.new_event_loop())
+import asyncio
 
 app = Flask(__name__)
 

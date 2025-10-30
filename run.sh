@@ -23,7 +23,7 @@ fi
 
 # Run new container
 echo "Starting $CONTAINER_NAME on network $NETWORK_NAME..."
-docker run -it \
+docker run -it -d \
     --name $CONTAINER_NAME \
     --network $NETWORK_NAME \
     --restart unless-stopped \
