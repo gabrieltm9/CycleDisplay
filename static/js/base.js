@@ -1,3 +1,19 @@
+const BASE_WIDTH = 1920;
+const BASE_HEIGHT = 1080;
+const BASE_FONT_SIZE = 16;
+
+// Keep the UI proportionally sized across common display resolutions.
+function applyResponsiveScale() {
+    const widthRatio = window.innerWidth / BASE_WIDTH;
+    const heightRatio = window.innerHeight / BASE_HEIGHT;
+    const scale = Math.min(widthRatio, heightRatio);
+    const clampedScale = Math.max(0.5, scale);
+    document.documentElement.style.fontSize = `${BASE_FONT_SIZE * clampedScale}px`;
+}
+
+window.addEventListener('resize', applyResponsiveScale);
+applyResponsiveScale();
+
 let cycle = true;
 let cycleTime = 20000;
 
@@ -55,6 +71,8 @@ function appendScript(page) {
 
 // Function to show a specific page
 window.onload = function() {
+    applyResponsiveScale();
+
     // Check if the current URL is not '/'
     if (window.location.pathname == '/') {
         if (cycle) {

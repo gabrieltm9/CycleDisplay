@@ -1,6 +1,6 @@
 /* Container to take full width with padding and small margins */
 .news-container {
-    padding: 10px;
+    padding: 0.625rem;
     max-width: 100vw;
     margin: 0 auto;
     height: 98.5vh;
@@ -8,11 +8,11 @@
 
 /* Title for each row */
 .row-title {
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: bold;
     text-align: left;
-    margin-bottom: 4px;
-    margin-left: 5px;
+    margin-bottom: 0.25rem;
+    margin-left: 0.3125rem;
 }
 
 /* Create 6 columns per row for articles */
@@ -28,8 +28,8 @@
 .news-card {
     display: flex;
     flex-direction: column;
-    min-width: 300px;
-    margin-bottom: 15px;
+    min-width: 18.75rem;
+    margin-bottom: 0.9375rem;
 }
 
 /* Make the card fill the available height */
@@ -40,7 +40,7 @@
 
 /* Restrict image height and keep aspect ratio */
 .card-img-top {
-    max-height: 100px;  /* Reduced image height */
+    max-height: 6.25rem;  /* Reduced image height */
     object-fit: cover;
 }
 
@@ -51,7 +51,7 @@
     justify-content: space-between;
     text-align: center;
     font-size: 0.9em;  /* Smaller text to fit more content */
-    padding: 10px 15px 5px 15px !important;
+    padding: 0.625rem 0.9375rem 0.3125rem 0.9375rem !important;
 }
 
 .card-title {
@@ -72,7 +72,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-top: 10px;
+    padding-top: 0.625rem;
 }
 
 /* Center the URL */
