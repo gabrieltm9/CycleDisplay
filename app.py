@@ -204,5 +204,6 @@ def favicon():
 
 # Start the background task to update data and run the app
 if __name__ == '__main__':
-    context = ('origin.pem', 'privkey.pem') #certificate and key files
-    app.run(host='0.0.0.0', port=5000, ssl_context=context)
+    #context = ('origin.pem', 'privkey.pem') #certificate and key files
+    debug_mode = os.getenv('DOCKER') is None
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode) #, ssl_context=context)
