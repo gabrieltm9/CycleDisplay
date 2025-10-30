@@ -26,6 +26,7 @@ refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 
 # Async function to fetch and update weather and stock data
 async def update_data():
+    print("Update data called!")
     global latest_weather, latest_stocks, latest_news, last_update_time, time_remaining, refresh_interval
     stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META', 'QCOM']  # stock symbols
     
@@ -83,6 +84,7 @@ async def update_data():
 
 # Function to check if an update is needed and update the data
 async def check_update():
+    print("check_update called. last_update_time =", last_update_time)
     global time_remaining
     time_remaining = time_until_next_refresh()
     if time_remaining.total_seconds() <= 0:
@@ -204,6 +206,6 @@ def favicon():
 
 # Start the background task to update data and run the app
 if __name__ == '__main__':
-    #context = ('origin.pem', 'privkey.pem') #certificate and key files
+    context = ('origin.pem', 'privkey.pem') #certificate and key files
     debug_mode = os.getenv('DOCKER') is None
-    app.run(host='0.0.0.0', port=5000, debug=debug_mode) #, ssl_context=context)
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode, ssl_context=context)
