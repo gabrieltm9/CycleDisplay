@@ -23,14 +23,12 @@ fi
 
 # Run new container
 echo "Starting $CONTAINER_NAME on network $NETWORK_NAME..."
-docker run -d \
-  --name $CONTAINER_NAME \
-  --network $NETWORK_NAME \
-  --restart unless-stopped \
-  -p $PORT:$PORT \
-  -v /etc/localtime:/etc/localtime:ro \
-  -v /etc/timezone:/etc/timezone:ro \
-  $IMAGE_NAME
+docker run -it \
+    --name $CONTAINER_NAME \
+    --network $NETWORK_NAME \
+    --restart unless-stopped \
+    -p $PORT:$PORT \
+    $IMAGE_NAME
 
 # Show status
 echo "Container '$CONTAINER_NAME' is now running."
