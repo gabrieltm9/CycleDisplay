@@ -1,6 +1,6 @@
-import asyncio
 import gc
 import os
+import threading
 from flask import Flask, render_template, redirect, send_from_directory
 from datetime import datetime, timedelta
 
@@ -9,12 +9,10 @@ from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp50
 from news import fetch_news
 from fifa import render_fifa
 
-import asyncio
-
 app = Flask(__name__)
 
-# Create an async lock for managing access to globals
-data_lock = asyncio.Lock()
+# Thread lock for managing access to globals
+data_lock = threading.Lock()
 
 # ----------------------- Data -----------------------
 # Global variables to store the latest data and time of the last update
@@ -26,13 +24,12 @@ last_update_time = None
 time_remaining = timedelta(0)
 refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 
-# Async function to fetch and update weather and stock data
-async def update_data():
-    print("Update data called!")
-    global latest_weather, latest_stocks, latest_news, last_update_time, time_remaining, refresh_interval
+# Function to fetch and update weather and stock data (synchronous)
+def update_data():
+    global latest_weather, latest_stocks, latest_news, last_update_time
     stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META', 'QCOM']  # stock symbols
     
-    async with data_lock:
+    with data_lock:
         try:
             # Update the last update time
             last_update_time = datetime.now()
@@ -40,20 +37,27 @@ async def update_data():
             print(f"Updating data at {last_update_time}")
 
             # Fetch weather for a hardcoded location (e.g., 'manhattan')
-            latest_weather = await get_weather('manhattan')
-            latest_weather['current']['temperature_2m_f'] = celcius_to_fahrenheit(latest_weather['current']['temperature_2m'])
-            latest_weather['daily']['temperature_2m_max_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_max'])
-            latest_weather['daily']['temperature_2m_min_f'] = celcius_to_fahrenheit(latest_weather['daily']['temperature_2m_min'])
-            latest_weather['daily']['sunrise'] = [
+            weather_data = get_weather('manhattan')
+            
+            # Check if we got an error response
+            if 'error' in weather_data:
+                print(f"Weather API error: {weather_data['error']}")
+                raise Exception(f"Failed to fetch weather: {weather_data['error']}")
+            
+            weather_data['current']['temperature_2m_f'] = celcius_to_fahrenheit(weather_data['current']['temperature_2m'])
+            weather_data['daily']['temperature_2m_max_f'] = celcius_to_fahrenheit(weather_data['daily']['temperature_2m_max'])
+            weather_data['daily']['temperature_2m_min_f'] = celcius_to_fahrenheit(weather_data['daily']['temperature_2m_min'])
+            weather_data['daily']['sunrise'] = [
                 datetime.strptime(sunrise, '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
-                for sunrise in latest_weather['daily']['sunrise']
+                for sunrise in weather_data['daily']['sunrise']
             ]
-            latest_weather['daily']['sunset'] = [
+            weather_data['daily']['sunset'] = [
                 datetime.strptime(sunset, '%Y-%m-%dT%H:%M').strftime('%I:%M %p')
-                for sunset in latest_weather['daily']['sunset']
+                for sunset in weather_data['daily']['sunset']
             ]
             wind_directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
-            latest_weather['current']['wind_direction_10m'] = wind_directions[int((latest_weather['current']['wind_direction_10m'] + 22.5) / 45) % 8]
+            weather_data['current']['wind_direction_10m'] = wind_directions[int((weather_data['current']['wind_direction_10m'] + 22.5) / 45) % 8]
+            latest_weather = weather_data
             
             print("Weather data updated successfully! Temp: " + str(latest_weather['current']['temperature_2m']))
 
@@ -80,18 +84,19 @@ async def update_data():
                 print("No news articles fetched.")
         except Exception as e:
             print(f"Error updating data: {e}")
+            import traceback
+            traceback.print_exc()
         
     # Force garbage collection after data update
     gc.collect()
 
 # Function to check if an update is needed and update the data
-async def check_update():
-    print("check_update called. last_update_time =", last_update_time)
+def check_update():
     global time_remaining
     time_remaining = time_until_next_refresh()
     if time_remaining.total_seconds() <= 0:
         print("Time to update data!")
-        await update_data()
+        update_data()
         time_remaining = refresh_interval
     else:
         print("Update time remaining: " + str(time_remaining)[:7])
@@ -119,8 +124,8 @@ def inject_data():
 
 # ----------------------- Index -----------------------
 @app.route('/')
-async def index():
-    await check_update()
+def index():
+    check_update()
 
     if latest_weather is None:
         return "Data is not available yet :( Please try again later."
@@ -133,8 +138,8 @@ def cycle():
 # ----------------------- Weather -----------------------
 # Route to return the weather page using the cached weather data
 @app.route('/weather')
-async def weather():
-    await check_update()
+def weather():
+    check_update()
 
     if latest_weather is None:
         return "Weather data is not available. Please try again later."
@@ -167,9 +172,9 @@ async def weather():
 # ----------------------- Stocks -----------------------
 # Route to return the stocks page using the cached stock data
 @app.route('/stocks')
-async def stocks():
+def stocks():
     global latest_stocks
-    await check_update()
+    check_update()
     
     if latest_stocks is None:
         return "Stock data is not available yet. Please try again later."
@@ -177,9 +182,9 @@ async def stocks():
 
 # ----------------------- News -----------------------
 @app.route('/news')
-async def news():
+def news():
     global latest_news
-    await check_update()
+    check_update()
 
     if latest_news is None:
         return "News data is not available yet. Please try again later."
@@ -208,6 +213,10 @@ def favicon():
 
 # Start the background task to update data and run the app
 if __name__ == '__main__':
+    # Fetch initial data before starting the server
+    print("Fetching initial data...")
+    update_data()
+    
     context = ('origin.pem', 'privkey.pem') #certificate and key files
     debug_mode = os.getenv('DOCKER') is None
     app.run(host='0.0.0.0', port=5000, debug=debug_mode, ssl_context=context)

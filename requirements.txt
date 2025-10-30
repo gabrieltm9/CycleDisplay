@@ -1,5 +1,5 @@
 aiohttp==3.10.5
-Flask[async]==3.0.3
+Flask==3.0.3
 matplotlib==3.9.2
 pandas==2.2.3
 Requests==2.32.3

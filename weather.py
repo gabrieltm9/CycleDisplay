@@ -1,39 +1,59 @@
-import aiohttp
-from flask import jsonify
+import requests
 
 # Helper function to get coordinates from Nominatim
-async def get_coordinates(city):
+def get_coordinates(city):
     location_url = f"https://nominatim.openstreetmap.org/search?q={city}&format=json&limit=1"
+    headers = {
+        'User-Agent': 'CycleDisplay/1.0 (Weather App)'
+    }
     
-    async with aiohttp.ClientSession() as session:
-        async with session.get(location_url) as response:
-            location_response = await response.json()
-            await session.close()
+    try:
+        response = requests.get(location_url, headers=headers, timeout=5)
+        response.raise_for_status()
+        
+        if response.text.strip() == '':
+            print(f"Warning: Empty response from Nominatim for city: {city}")
+            return None, None
+            
+        location_response = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching coordinates for {city}: {e}")
+        return None, None
+    except Exception as e:
+        print(f"Error parsing coordinates response: {e}")
+        return None, None
 
     if not location_response:
-        return None, None  # Handle location not found
+        print(f"City not found: {city}")
+        return None, None
 
     lat = location_response[0]['lat']
     lon = location_response[0]['lon']
     return lat, lon
 
-async def get_weather(location):
+def get_weather(location):
     if location == 'boston':
         lat, lon = 42.361145, -71.057083
     else:
-        lat, lon = await get_coordinates(location)
+        lat, lon = get_coordinates(location)
 
     if lat is None or lon is None:
-        return jsonify({'error': 'Location not found'}), 404
+        return {'error': 'Location not found'}
 
     # Fetch weather data from Open-Meteo
     weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,weather_code,precipitation_sum,relative_humidity_2m_max&timezone=America%2FNew_York"
     
-    async with aiohttp.ClientSession() as session:
-        async with session.get(weather_url) as response:
-            weather_response = await response.json()
-            await session.close()
-            return weather_response
+    try:
+        response = requests.get(weather_url, timeout=5)
+        response.raise_for_status()
+        weather_response = response.json()
+        return weather_response
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data: {e}")
+        return {'error': str(e)}
+    except Exception as e:
+        print(f"Error parsing weather response: {e}")
+        return {'error': str(e)}
 
 def celcius_to_fahrenheit(celcius):
     if isinstance(celcius, list):
