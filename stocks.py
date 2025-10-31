@@ -84,16 +84,26 @@ def get_sp500_graph(sp500_data, transparent=False):
     ax.set_ylabel('')
     
     # For transparent mode, make axes and ticks lighter or hidden
-    if transparent:
-        ax.tick_params(axis='x', colors='#6b7280', labelsize=9, rotation=45)
-        ax.tick_params(axis='y', colors='#6b7280', labelsize=9)
-    else:
-        ax.tick_params(axis='x', colors='#374151', labelsize=10, rotation=45)
-        ax.tick_params(axis='y', colors='#374151', labelsize=10)
+    ax.tick_params(axis='x', colors='#374151', labelsize=13, rotation=45)
+    ax.tick_params(axis='y', colors='#374151', labelsize=13)
 
-    ax.xaxis.set_major_locator(mdates.DayLocator())
+
+    # Set X-axis to have exactly 5 labels
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator(interval_multiples=False))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    ax.xaxis.set_major_locator(mtick.MaxNLocator(nbins=5, integer=False))
+    
+    # Format dates manually for x-axis with exactly 5 ticks
+    dates = sp500_data.index
+    num_ticks = 5
+    tick_positions = [dates[int(i)] for i in [0, len(dates)//4, len(dates)//2, 3*len(dates)//4, len(dates)-1]]
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels([d.strftime('%m-%d') for d in tick_positions], rotation=45)
+    
     ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('${x:,.0f}'))
+    
+    # Reduce the number of Y-axis ticks to accommodate larger font size
+    ax.yaxis.set_major_locator(mtick.MaxNLocator(nbins=4))
 
     for spine in ('top', 'right'):
         ax.spines[spine].set_visible(False)

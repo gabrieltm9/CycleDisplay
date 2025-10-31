@@ -250,6 +250,56 @@ function setupAutoRefresh() {
     }, refreshInterval);
 }
 
+// Randomized Gradient Background
+function initRandomizedGradient() {
+    const body = document.body;
+    
+    // Function to generate random percentage between min and max
+    function randomPercent(min = 0, max = 100) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    // Function to generate random duration between min and max seconds
+    function randomDuration(min = 15, max = 35) {
+        return (Math.random() * (max - min) + min).toFixed(1) + 's';
+    }
+    
+    // Function to update gradient positions
+    function updateGradientPositions() {
+        for (let i = 1; i <= 7; i++) {
+            body.style.setProperty(`--grad${i}-x`, randomPercent(0, 100) + '%');
+            body.style.setProperty(`--grad${i}-y`, randomPercent(0, 100) + '%');
+        }
+    }
+    
+    // Function to update animation durations
+    function updateAnimationDurations() {
+        body.style.setProperty('--duration1', randomDuration(20, 35));
+        body.style.setProperty('--duration2', randomDuration(25, 40));
+        body.style.setProperty('--duration3', randomDuration(20, 35));
+    }
+    
+    // Initial setup
+    updateGradientPositions();
+    updateAnimationDurations();
+    
+    // Update gradient positions every 30-60 seconds for organic flow
+    setInterval(updateGradientPositions, Math.random() * 30000 + 30000);
+    
+    // Update animation durations every 3-5 minutes for rhythm changes
+    setInterval(updateAnimationDurations, Math.random() * 120000 + 180000);
+}
+
+// Auto-refresh page after 5 minutes to trigger data update
+function setupAutoRefresh() {
+    const refreshInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+    
+    setTimeout(() => {
+        console.log('Auto-refreshing page to fetch updated data...');
+        window.location.reload();
+    }, refreshInterval);
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initWeatherIcons();
@@ -264,4 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup auto-refresh after 5 minutes
     setupAutoRefresh();
+    
+    // Initialize randomized gradient background
+    initRandomizedGradient();
 });
