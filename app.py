@@ -235,6 +235,8 @@ def home():
                     'low_c': daily_data['temperature_2m_min'][index],
                     'high_f': daily_data['temperature_2m_max_f'][index],
                     'low_f': daily_data['temperature_2m_min_f'][index],
+                    'precipitation': daily_data.get('precipitation_sum', [0] * len(daily_data['time']))[index],
+                    'humidity': daily_data.get('relative_humidity_2m_max', [0] * len(daily_data['time']))[index],
                 })
         except (KeyError, IndexError) as e:
             print(f"Error preparing weather preview: {e}")
