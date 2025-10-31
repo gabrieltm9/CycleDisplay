@@ -73,7 +73,7 @@ def fetch_news(categories = ['politics','business','technology','science'], coun
 
     if not is_within_time_range():
         print("Conditions not met for fetching news - not within time range: {} to {}".format(start_fetch, end_fetch))
-        return []
+        #return []
     if not check_fetch_delay():
         remaining_delay = last_api_call + time_between_fetches - datetime.now()
         print(f"Conditions not met for fetching news - remaining fetch delay: {remaining_delay}")

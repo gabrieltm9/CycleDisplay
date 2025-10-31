@@ -62,7 +62,7 @@ def fetch_sp500_data():
         return None
 
 # Function to generate S&P 500 graph with improved aesthetics
-def get_sp500_graph(sp500_data):
+def get_sp500_graph(sp500_data, transparent=False):
     # Plot the S&P 500 data with improved aesthetics
     line_color = '#2563eb'
     fill_color = '#2563eb'
@@ -72,12 +72,24 @@ def get_sp500_graph(sp500_data):
     ax.fill_between(sp500_data.index, values, color=fill_color, alpha=0.08)
 
     # Apply minimalist styling that still keeps the chart readable in the dashboard
-    ax.set_facecolor('white')
-    fig.patch.set_alpha(0)
+    if transparent:
+        # Set fully transparent backgrounds
+        fig.patch.set_visible(False)
+        ax.patch.set_visible(False)
+    else:
+        ax.set_facecolor('white')
+        fig.patch.set_facecolor('white')
+    
     ax.set_xlabel('')
     ax.set_ylabel('')
-    ax.tick_params(axis='x', colors='#374151', labelsize=10, rotation=45)
-    ax.tick_params(axis='y', colors='#374151', labelsize=10)
+    
+    # For transparent mode, make axes and ticks lighter or hidden
+    if transparent:
+        ax.tick_params(axis='x', colors='#6b7280', labelsize=9, rotation=45)
+        ax.tick_params(axis='y', colors='#6b7280', labelsize=9)
+    else:
+        ax.tick_params(axis='x', colors='#374151', labelsize=10, rotation=45)
+        ax.tick_params(axis='y', colors='#374151', labelsize=10)
 
     ax.xaxis.set_major_locator(mdates.DayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
@@ -86,10 +98,18 @@ def get_sp500_graph(sp500_data):
     for spine in ('top', 'right'):
         ax.spines[spine].set_visible(False)
     for spine in ('left', 'bottom'):
-        ax.spines[spine].set_color('#d1d5db')
-        ax.spines[spine].set_linewidth(1)
+        if transparent:
+            ax.spines[spine].set_color('#9ca3af')
+            ax.spines[spine].set_linewidth(0.8)
+            ax.spines[spine].set_alpha(0.5)
+        else:
+            ax.spines[spine].set_color('#d1d5db')
+            ax.spines[spine].set_linewidth(1)
 
-    ax.grid(axis='y', color='#e5e7eb', linewidth=0.8, alpha=0.8, linestyle='-')
+    if transparent:
+        ax.grid(axis='y', color='#9ca3af', linewidth=0.5, alpha=0.25, linestyle='-')
+    else:
+        ax.grid(axis='y', color='#e5e7eb', linewidth=0.8, alpha=0.8, linestyle='-')
     ax.grid(False, axis='x')
 
     # Fit the y-axis tightly around the data with a small visual buffer
@@ -107,7 +127,12 @@ def get_sp500_graph(sp500_data):
 
     # Save the graph to a bytes buffer
     buf = BytesIO()
-    fig.savefig(buf, format="png", dpi=200, bbox_inches='tight')
+    if transparent:
+        # For transparent mode, use facecolor='none' and ensure transparency
+        fig.savefig(buf, format="png", dpi=200, bbox_inches='tight', 
+                   transparent=True, facecolor='none', edgecolor='none')
+    else:
+        fig.savefig(buf, format="png", dpi=200, bbox_inches='tight', transparent=False)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()

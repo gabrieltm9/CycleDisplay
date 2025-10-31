@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Home - Cycle Display</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/home.css">
+</head>
+<body>
+    <div class="home-container">
+        {% if not sp500_graph and not stock_prices and not weather_preview and not news_data %}
+        <div class="no-data-message">
+            <h1>Welcome to Cycle Display</h1>
+            <p>Data is being loaded. Please wait a moment and refresh the page.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Main Grid Container -->
+        <div class="tiles-grid">
+            
+            <!-- Stock Watchlist Tile (Top Left) -->
+            {% if stock_prices %}
+            <div class="tile tile-watchlist watchlist-tile">
+                <div class="tile-content">
+                    <h2 class="tile-title">Watchlist</h2>
+                    <div class="stock-list">
+                        {% for stock in stock_prices[:8] %}
+                        <div class="stock-item">
+                            <img src="https://assets.parqet.com/logos/symbol/{{ stock.symbol }}?format=png" 
+                                 alt="{{ stock.symbol }}" 
+                                 class="stock-logo">
+                            <span class="stock-symbol">{{ stock.symbol }}</span>
+                            <span class="stock-price">${{ stock.price | round(2) }}</span>
+                            <span class="stock-change {% if stock.percentage_change > 0 %}positive{% else %}negative{% endif %}">
+                                {{ stock.percentage_change }}%
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- News Carousel Tile (Top Right - Largest) -->
+            {% if news_data %}
+            <div class="tile tile-news news-tile">
+                <div class="tile-content">
+                    <h2 class="tile-title">Latest News</h2>
+                    <div class="news-carousel">
+                        <div class="carousel-track">
+                            {% for article in news_data %}
+                            <div class="news-card">
+                                {% if article.image %}
+                                <div class="news-image-wrapper">
+                                    <img src="{{ article.image }}" alt="{{ article.title }}" class="news-image">
+                                </div>
+                                {% endif %}
+                                <div class="news-content">
+                                    <h3 class="news-title">{{ article.title }}</h3>
+                                    <p class="news-date">{{ article.publish_date }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="carousel-dots"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- SP500 Graph Tile (Under Watchlist) -->
+            {% if sp500_graph and sp500_change %}
+            <div class="tile tile-sp500 sp500-tile">
+                <div class="tile-content">
+                    <div class="sp500-header">
+                        <h2 class="tile-title" style="margin-bottom: 0px;">S&P 500</h2>
+                        <div class="sp500-change {% if sp500_change[0] > 0 %}positive{% else %}negative{% endif %}">
+                            <span class="change-value">{% if sp500_change[0] > 0 %}+{% endif %}${{ sp500_change[0] | round(2) }}</span>
+                            <span class="change-percent">{{ sp500_change[1] | round(2) }}%</span>
+                        </div>
+                    </div>
+                    <div class="graph-wrapper">
+                        <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="sp500-graph">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 5-Day Weather Preview Tile (Bottom, spans 5 columns) -->
+            {% if weather_preview %}
+            <div class="tile tile-weather weather-tile">
+                <div class="tile-content">
+                    <h2 class="tile-title">Weather</h2>
+                    <div class="weather-grid">
+                        {% for day in weather_preview %}
+                        <div class="weather-day" data-code="{{ day.code }}">
+                            <div class="day-name">{{ day.date }}</div>
+                            <img class="weather-icon" src="" alt="Weather">
+                            <div class="temps">
+                                <div class="temp-celsius">
+                                    <span class="temp-low-c">{{ day.low_c }}°</span>
+                                    <span class="temp-high-c">{{ day.high_c }}°</span>
+                                </div>
+                                <div class="temp-fahrenheit">
+                                    <span class="temp-low-f">{{ day.low_f }}°</span>
+                                    <span class="temp-high-f">{{ day.high_f }}°</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Footer with weather, temperature, icon, humidity, and time -->
+    {% if weather %}
+    <footer class="footer fixed-bottom">
+        <div class="footer-content">
+            <!-- Location and Weather Info -->
+            <div class="footer-info">
+                <!-- Hidden weather code element for parsing in JS -->
+                <span id="weather-code" style="display: none">{{ weather['current']['weather_code'] }}</span>
+                    
+                <!-- Weather -->
+                <div class="info-item">
+                    <img id="weather-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day.svg" class="img-fluid">
+                    <span id="weather-desc">Partly Cloudy</span>
+                </div>
+
+                <!-- Temperature -->
+                <div class="info-item">
+                    <img id="temp-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/thermometer.svg" class="img-fluid">
+                    <span id="current-temp-f">{{ weather['current']['temperature_2m_f'] }}°F /&nbsp</span>
+                    <span id="current-temp-c">{{ weather['current']['temperature_2m'] }}°C</span>
+                </div>
+
+                <!-- Humidity -->
+                <div class="info-item">
+                    <img id="humidity-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/humidity.svg" class="img-fluid">
+                    <span id="humidity">{{ weather['current']['relative_humidity_2m'] }}%</span>
+                </div>
+
+                <!-- Precipitation -->
+                <div class="info-item">
+                    <img id="precipitation-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/raindrops.svg" class="img-fluid">
+                    <span id="precipitation">{{ weather['current']['precipitation'] }}mm</span>
+                </div>
+
+                <!-- Wind -->
+                <div class="info-item">
+                    <img id="wind-icon" src="https://basmilius.github.io/weather-icons/production/fill/all/wind.svg" class="img-fluid">
+                    <span id="wind">{{ weather['current']['wind_speed_10m'] }}km/h {{ weather['current']['wind_direction_10m'] }}</span>
+                </div>
+
+                <!-- Sunrise -->
+                <div class="info-item">
+                    <img id="sunrise-icon" src="/static/icons/sunrise.svg" class="img-fluid">
+                    <span id="sunrise">{{ weather['daily']['sunrise'][0] }}</span>
+                </div>
+
+                <!-- Sunset -->
+                <div class="info-item">
+                    <img id="sunset-icon" src="/static/icons/sunset.svg" class="img-fluid">
+                    <span id="sunset">{{ weather['daily']['sunset'][0] }}</span>
+                </div>
+            </div>
+
+            <!-- Current Time -->
+            <div id="current-time">{{ current_time }}</div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>

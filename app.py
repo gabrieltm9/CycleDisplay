@@ -27,7 +27,7 @@ refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 # Function to fetch and update weather and stock data (synchronous)
 def update_data():
     global latest_weather, latest_stocks, latest_news, last_update_time
-    stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META', 'QCOM']  # stock symbols
+    stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META', 'QCOM', 'AMD', 'INTC']  # stock symbols
     
     with data_lock:
         try:
@@ -65,10 +65,12 @@ def update_data():
             stock_prices = get_stock_prices(stock_symbols)
             sp500_data = fetch_sp500_data()
             sp500_graph = get_sp500_graph(sp500_data)
+            sp500_graph_transparent = get_sp500_graph(sp500_data, transparent=True)
             sp500_change = get_sp500_change(sp500_data)
             latest_stocks = {
                 'stock_prices': stock_prices,
                 'sp500_graph': sp500_graph,
+                'sp500_graph_transparent': sp500_graph_transparent,
                 'sp500_change': sp500_change
             }
 
@@ -194,6 +196,60 @@ def news():
 @app.route('/fifa')
 def fifa():
     return render_fifa()
+
+# ----------------------- Home -----------------------
+@app.route('/home')
+def home():
+    check_update()
+    
+    # Prepare data for each tile, setting to None if unavailable
+    stock_prices = None
+    sp500_graph = None
+    sp500_change = None
+    weather_preview = None
+    news_data = None
+    
+    # Stock data
+    if latest_stocks is not None:
+        stock_prices = latest_stocks.get('stock_prices')
+        sp500_graph = latest_stocks.get('sp500_graph_transparent')  # Use transparent version for home
+        sp500_change = latest_stocks.get('sp500_change')
+    
+    # Weather data
+    if latest_weather is not None:
+        try:
+            daily_data = latest_weather['daily']
+            weather_preview = []
+            for index in range(5):
+                date_str = daily_data['time'][index]
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    formatted_date = date_obj.strftime('%a')
+                except ValueError:
+                    formatted_date = date_str
+                
+                weather_preview.append({
+                    'date': formatted_date,
+                    'code': daily_data.get('weather_code', [None] * len(daily_data['time']))[index],
+                    'high_c': daily_data['temperature_2m_max'][index],
+                    'low_c': daily_data['temperature_2m_min'][index],
+                    'high_f': daily_data['temperature_2m_max_f'][index],
+                    'low_f': daily_data['temperature_2m_min_f'][index],
+                })
+        except (KeyError, IndexError) as e:
+            print(f"Error preparing weather preview: {e}")
+            weather_preview = None
+    
+    # News data
+    if latest_news is not None:
+        news_data = latest_news
+    
+    return render_template('home.html', 
+                         stock_prices=stock_prices,
+                         sp500_graph=sp500_graph,
+                         sp500_change=sp500_change,
+                         weather_preview=weather_preview,
+                         news_data=news_data)
 
 # ----------------------- Dashboard -----------------------
 @app.route('/dashboard')
