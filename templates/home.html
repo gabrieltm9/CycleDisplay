@@ -18,21 +18,14 @@
 </head>
 <body>
     <div class="home-container">
-        {% if not sp500_graph and not stock_prices and not weather_preview and not news_data %}
-        <div class="no-data-message">
-            <h1>Welcome to Cycle Display</h1>
-            <p>Data is being loaded. Please wait a moment and refresh the page.</p>
-        </div>
-        {% endif %}
-        
         <!-- Main Grid Container -->
         <div class="tiles-grid">
             
             <!-- Stock Watchlist Tile (Top Left) -->
-            {% if stock_prices %}
             <div class="tile tile-watchlist watchlist-tile">
                 <div class="tile-content">
                     <h2 class="tile-title">Watchlist</h2>
+                    {% if stock_prices %}
                     <div class="stock-list">
                         {% for stock in stock_prices[:8] %}
                         <div class="stock-item">
@@ -47,15 +40,19 @@
                         </div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="tile-loading-message">
+                        <p>Loading stock data...</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
 
             <!-- News Carousel Tile (Top Right - Largest) -->
-            {% if news_data %}
             <div class="tile tile-news news-tile">
                 <div class="tile-content">
                     <h2 class="tile-title">Latest News</h2>
+                    {% if news_data %}
                     <div class="news-carousel">
                         <div class="carousel-track">
                             {% for article in news_data %}
@@ -74,14 +71,18 @@
                         </div>
                         <div class="carousel-dots"></div>
                     </div>
+                    {% else %}
+                    <div class="tile-loading-message">
+                        <p>Loading news articles...</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
 
             <!-- SP500 Graph Tile (Under Watchlist) -->
-            {% if sp500_graph and sp500_change %}
             <div class="tile tile-sp500 sp500-tile">
                 <div class="tile-content">
+                    {% if sp500_graph and sp500_change %}
                     <div class="sp500-header">
                         <h2 class="tile-title" style="margin-bottom: 0px;">S&P 500</h2>
                         <div class="sp500-change {% if sp500_change[0] > 0 %}positive{% else %}negative{% endif %}">
@@ -92,15 +93,20 @@
                     <div class="graph-wrapper">
                         <img src="data:image/png;base64,{{ sp500_graph }}" alt="S&P 500 Graph" class="sp500-graph">
                     </div>
+                    {% else %}
+                    <h2 class="tile-title">S&P 500</h2>
+                    <div class="tile-loading-message">
+                        <p>Loading S&P 500 data...</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
 
             <!-- 5-Day Weather Preview Tile (Bottom, spans 5 columns) -->
-            {% if weather_preview %}
             <div class="tile tile-weather weather-tile">
                 <div class="tile-content">
                     <h2 class="tile-title">Weather</h2>
+                    {% if weather_preview %}
                     <div class="weather-grid">
                         {% for day in weather_preview %}
                         <div class="weather-day" data-code="{{ day.code }}">
@@ -119,9 +125,13 @@
                         </div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="tile-loading-message">
+                        <p>Loading weather data...</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
 
         </div>
     </div>
