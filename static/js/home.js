@@ -225,19 +225,67 @@ function initFooterWeather() {
     }
 }
 
-// Dark Mode Management (10pm - 9am)
+// Dark Mode Management based on Sunset/Sunrise times
 function checkDarkMode() {
-    const now = new Date();
-    const hours = now.getHours();
+    const sunriseElem = document.getElementById('sunrise');
+    const sunsetElem = document.getElementById('sunset');
     
-    // Dark mode between 10pm (22:00) and 9am (09:00)
-    const isDarkModeTime = hours >= 22 || hours < 9;
+    if (!sunriseElem || !sunsetElem) {
+        // Fallback to hardcoded times if elements not found
+        const now = new Date();
+        const hours = now.getHours();
+        const isDarkModeTime = hours >= 22 || hours < 9;
+        
+        if (isDarkModeTime) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        return;
+    }
+    
+    // Parse sunrise and sunset times (format: "HH:MM AM/PM")
+    const sunriseText = sunriseElem.textContent.trim();
+    const sunsetText = sunsetElem.textContent.trim();
+    
+    const sunriseTime = parseTime(sunriseText);
+    const sunsetTime = parseTime(sunsetText);
+    
+    if (sunriseTime === null || sunsetTime === null) {
+        console.warn('Could not parse sunrise/sunset times');
+        return;
+    }
+    
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes
+    
+    // Dark mode is active if current time is after sunset OR before sunrise
+    const isDarkModeTime = currentTime >= sunsetTime || currentTime < sunriseTime;
     
     if (isDarkModeTime) {
         document.body.classList.add('dark-mode');
     } else {
         document.body.classList.remove('dark-mode');
     }
+}
+
+// Helper function to parse time string in "HH:MM AM/PM" format to minutes since midnight
+function parseTime(timeStr) {
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return null;
+    
+    let hours = parseInt(match[1]);
+    const minutes = parseInt(match[2]);
+    const period = match[3].toUpperCase();
+    
+    // Convert to 24-hour format
+    if (period === 'PM' && hours !== 12) {
+        hours += 12;
+    } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+    }
+    
+    return hours * 60 + minutes; // Return total minutes since midnight
 }
 
 // Auto-refresh page after 5 minutes to trigger data update
