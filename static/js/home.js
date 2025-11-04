@@ -302,17 +302,49 @@ function setupAutoRefresh() {
 function initRandomizedGradient() {
     const body = document.body;
     
+    // Add CSS for smooth transitions of CSS variables
+    const style = document.createElement('style');
+    style.textContent = `
+        body {
+            transition: 
+                --grad1-x 8s ease-in-out,
+                --grad1-y 8s ease-in-out,
+                --grad2-x 10s ease-in-out,
+                --grad2-y 10s ease-in-out,
+                --grad3-x 9s ease-in-out,
+                --grad3-y 9s ease-in-out,
+                --grad4-x 11s ease-in-out,
+                --grad4-y 11s ease-in-out,
+                --grad5-x 7s ease-in-out,
+                --grad5-y 7s ease-in-out,
+                --grad6-x 9s ease-in-out,
+                --grad6-y 9s ease-in-out,
+                --grad7-x 10s ease-in-out,
+                --grad7-y 10s ease-in-out;
+        }
+        @property --grad1-x { syntax: '<percentage>'; inherits: true; initial-value: 15%; }
+        @property --grad1-y { syntax: '<percentage>'; inherits: true; initial-value: 25%; }
+        @property --grad2-x { syntax: '<percentage>'; inherits: true; initial-value: 75%; }
+        @property --grad2-y { syntax: '<percentage>'; inherits: true; initial-value: 65%; }
+        @property --grad3-x { syntax: '<percentage>'; inherits: true; initial-value: 45%; }
+        @property --grad3-y { syntax: '<percentage>'; inherits: true; initial-value: 55%; }
+        @property --grad4-x { syntax: '<percentage>'; inherits: true; initial-value: 85%; }
+        @property --grad4-y { syntax: '<percentage>'; inherits: true; initial-value: 15%; }
+        @property --grad5-x { syntax: '<percentage>'; inherits: true; initial-value: 5%; }
+        @property --grad5-y { syntax: '<percentage>'; inherits: true; initial-value: 75%; }
+        @property --grad6-x { syntax: '<percentage>'; inherits: true; initial-value: 60%; }
+        @property --grad6-y { syntax: '<percentage>'; inherits: true; initial-value: 35%; }
+        @property --grad7-x { syntax: '<percentage>'; inherits: true; initial-value: 25%; }
+        @property --grad7-y { syntax: '<percentage>'; inherits: true; initial-value: 85%; }
+    `;
+    document.head.appendChild(style);
+    
     // Function to generate random percentage between min and max
     function randomPercent(min = 0, max = 100) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     
-    // Function to generate random duration between min and max seconds
-    function randomDuration(min = 15, max = 35) {
-        return (Math.random() * (max - min) + min).toFixed(1) + 's';
-    }
-    
-    // Function to update gradient positions
+    // Function to update gradient positions with smooth transition
     function updateGradientPositions() {
         for (let i = 1; i <= 7; i++) {
             body.style.setProperty(`--grad${i}-x`, randomPercent(0, 100) + '%');
@@ -320,22 +352,11 @@ function initRandomizedGradient() {
         }
     }
     
-    // Function to update animation durations
-    function updateAnimationDurations() {
-        body.style.setProperty('--duration1', randomDuration(20, 35));
-        body.style.setProperty('--duration2', randomDuration(25, 40));
-        body.style.setProperty('--duration3', randomDuration(20, 35));
-    }
-    
     // Initial setup
     updateGradientPositions();
-    updateAnimationDurations();
     
-    // Update gradient positions every 30-60 seconds for organic flow
-    setInterval(updateGradientPositions, Math.random() * 30000 + 30000);
-    
-    // Update animation durations every 3-5 minutes for rhythm changes
-    setInterval(updateAnimationDurations, Math.random() * 120000 + 180000);
+    // Update gradient positions every 8-12 seconds for smooth organic flow
+    setInterval(updateGradientPositions, Math.random() * 4000 + 8000);
 }
 
 // Auto-refresh page after 5 minutes to trigger data update
@@ -348,11 +369,54 @@ function setupAutoRefresh() {
     }, refreshInterval);
 }
 
+// Tile Swapper for Watchlist and Subway
+class TileSwapper {
+    constructor() {
+        this.tiles = document.querySelectorAll('.swappable-tile');
+        this.currentIndex = 0;
+        this.swapInterval = 30000; // 30 seconds
+        this.autoSwapTimer = null;
+        
+        if (this.tiles.length > 1) {
+            this.init();
+        }
+    }
+    
+    init() {
+        this.startAutoSwap();
+    }
+    
+    swap() {
+        // Remove active class from current tile
+        this.tiles[this.currentIndex].classList.remove('active');
+        
+        // Move to next tile
+        this.currentIndex = (this.currentIndex + 1) % this.tiles.length;
+        
+        // Add active class to new tile
+        this.tiles[this.currentIndex].classList.add('active');
+    }
+    
+    startAutoSwap() {
+        this.autoSwapTimer = setInterval(() => {
+            this.swap();
+        }, this.swapInterval);
+    }
+    
+    stopAutoSwap() {
+        if (this.autoSwapTimer) {
+            clearInterval(this.autoSwapTimer);
+            this.autoSwapTimer = null;
+        }
+    }
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initWeatherIcons();
     initFooterWeather();
     new NewsCarousel();
+    new TileSwapper();
     
     // Check dark mode immediately
     checkDarkMode();
@@ -365,4 +429,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize randomized gradient background
     initRandomizedGradient();
+    
+    // Update clock in real-time
+    updateClock();
+    setInterval(updateClock, 1000);
 });
+
+// Function to update the clock in real-time
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be 12
+    hours = String(hours).padStart(2, '0');
+    const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
+    
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        timeElement.innerText = timeString;
+    }
+}

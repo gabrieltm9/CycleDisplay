@@ -21,30 +21,55 @@
         <!-- Main Grid Container -->
         <div class="tiles-grid">
             
-            <!-- Stock Watchlist Tile (Top Left) -->
-            <div class="tile tile-watchlist watchlist-tile">
-                <div class="tile-content">
-                    <h2 class="tile-title">Watchlist</h2>
-                    {% if stock_prices %}
-                    <div class="stock-list">
-                        {% for stock in stock_prices[:8] %}
-                        <div class="stock-item">
-                            <img src="https://assets.parqet.com/logos/symbol/{{ stock.symbol }}?format=png" 
-                                 alt="{{ stock.symbol }}" 
-                                 class="stock-logo">
-                            <span class="stock-symbol">{{ stock.symbol }}</span>
-                            <span class="stock-price">${{ stock.price | round(2) }}</span>
-                            <span class="stock-change {% if stock.percentage_change > 0 %}positive{% else %}negative{% endif %}">
-                                {{ stock.percentage_change }}%
-                            </span>
+            <!-- Container for swappable tiles -->
+            <div class="tile-swap-container">
+                <!-- Stock Watchlist Tile (Top Left) -->
+                <div class="tile tile-watchlist watchlist-tile swappable-tile active">
+                    <div class="tile-content">
+                        <h2 class="tile-title">Watchlist</h2>
+                        {% if stock_prices %}
+                        <div class="stock-list">
+                            {% for stock in stock_prices[:8] %}
+                            <div class="stock-item">
+                                <img src="https://assets.parqet.com/logos/symbol/{{ stock.symbol }}?format=png" 
+                                     alt="{{ stock.symbol }}" 
+                                     class="stock-logo">
+                                <span class="stock-symbol">{{ stock.symbol }}</span>
+                                <span class="stock-price">${{ stock.price | round(2) }}</span>
+                                <span class="stock-change {% if stock.percentage_change > 0 %}positive{% else %}negative{% endif %}">
+                                    {{ stock.percentage_change }}%
+                                </span>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% else %}
+                        <div class="tile-loading-message">
+                            <p>Loading stock data...</p>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <div class="tile-loading-message">
-                        <p>Loading stock data...</p>
+                </div>
+
+                <!-- Subway Tile (Hidden initially) -->
+                <div class="tile tile-subway subway-tile swappable-tile">
+                    <div class="tile-content">
+                        <h2 class="tile-title">51st St & Lexington Av</h2>
+                        {% if subway_data and subway_data.trains %}
+                        <div class="subway-list">
+                            {% for train in subway_data.trains %}
+                            <div class="subway-item">
+                                <span class="subway-line-badge">6</span>
+                                <span class="subway-destination">{{ train.direction }}</span>
+                                <span class="subway-minutes">{{ train.minutes_until }} min</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="tile-loading-message">
+                            <p>Loading subway data...</p>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
 

@@ -88,4 +88,6 @@ h6 {
 
 #current-time {
     font-size: 2.4rem; /* Larger time display */
+    font-variant-numeric: tabular-nums;
+    min-width: 12rem;
 }

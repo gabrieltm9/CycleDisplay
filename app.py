@@ -8,6 +8,7 @@ from weather import get_weather, celcius_to_fahrenheit
 from stocks import get_stock_prices, fetch_sp500_data, get_sp500_graph, get_sp500_change
 from news import fetch_news
 from fifa import render_fifa
+from subway import get_subway_data
 
 app = Flask(__name__)
 
@@ -19,6 +20,7 @@ data_lock = threading.Lock()
 latest_weather = None
 latest_stocks = None
 latest_news = None
+latest_subway = None
 
 last_update_time = None
 time_remaining = timedelta(0)
@@ -26,7 +28,7 @@ refresh_interval = timedelta(minutes=5)  # Refresh every 5 minutes
 
 # Function to fetch and update weather and stock data (synchronous)
 def update_data():
-    global latest_weather, latest_stocks, latest_news, last_update_time
+    global latest_weather, latest_stocks, latest_news, latest_subway, last_update_time
     stock_symbols = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'NVDA', 'IBM', 'TSLA', 'NFLX', 'META', 'QCOM', 'AMD', 'INTC']  # stock symbols
     
     with data_lock:
@@ -84,6 +86,14 @@ def update_data():
                 print("News data updated successfully! Articles: " + str(len(latest_news)))
             else:
                 print("No news articles fetched.")
+            
+            # Fetch subway data
+            subway_data = get_subway_data()
+            if subway_data:
+                latest_subway = subway_data
+                print(f"Subway data updated successfully! Next trains: {len(subway_data.get('trains', []))}")
+            else:
+                print("No subway data fetched.")
         except Exception as e:
             print(f"Error updating data: {e}")
             import traceback
@@ -208,6 +218,7 @@ def home():
     sp500_change = None
     weather_preview = None
     news_data = None
+    subway_data = None
     
     # Stock data
     if latest_stocks is not None:
@@ -246,12 +257,17 @@ def home():
     if latest_news is not None:
         news_data = latest_news
     
+    # Subway data
+    if latest_subway is not None:
+        subway_data = latest_subway
+    
     return render_template('home.html', 
                          stock_prices=stock_prices,
                          sp500_graph=sp500_graph,
                          sp500_change=sp500_change,
                          weather_preview=weather_preview,
-                         news_data=news_data)
+                         news_data=news_data,
+                         subway_data=subway_data)
 
 # ----------------------- Dashboard -----------------------
 @app.route('/dashboard')

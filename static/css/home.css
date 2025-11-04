@@ -28,10 +28,12 @@ body.dark-mode {
 body::before {
     content: '';
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     background: 
         radial-gradient(circle at var(--grad1-x, 15%) var(--grad1-y, 25%), rgba(135, 206, 250, 0.65) 0%, transparent 30%),
         radial-gradient(circle at var(--grad2-x, 75%) var(--grad2-y, 65%), rgba(173, 216, 230, 0.55) 0%, transparent 35%),
@@ -41,9 +43,8 @@ body::before {
         radial-gradient(circle at var(--grad6-x, 60%) var(--grad6-y, 35%), rgba(135, 206, 250, 0.50) 0%, transparent 28%),
         radial-gradient(circle at var(--grad7-x, 25%) var(--grad7-y, 85%), rgba(176, 224, 230, 0.35) 0%, transparent 32%),
         linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
-    animation: moveGradient1 var(--duration1, 23s) ease-in-out infinite, moveGradient2 var(--duration2, 31s) ease-out infinite, moveGradient3 var(--duration3, 27s) ease-in infinite;
     z-index: 0;
-    transition: background 0.5s ease;
+    will-change: background;
 }
 
 /* Dark Mode Background */
@@ -59,59 +60,7 @@ body.dark-mode::before {
         linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
 }
 
-@keyframes moveGradient1 {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-    25% {
-        transform: translate(-8%, 12%) rotate(85deg);
-    }
-    50% {
-        transform: translate(-3%, -15%) rotate(170deg);
-    }
-    75% {
-        transform: translate(10%, -8%) rotate(260deg);
-    }
-    100% {
-        transform: translate(0, 0) rotate(360deg);
-    }
-}
-
-@keyframes moveGradient2 {
-    0% {
-        transform: translate(5%, -3%) rotate(45deg);
-    }
-    25% {
-        transform: translate(-10%, -5%) rotate(120deg);
-    }
-    50% {
-        transform: translate(8%, 10%) rotate(200deg);
-    }
-    75% {
-        transform: translate(-2%, 6%) rotate(300deg);
-    }
-    100% {
-        transform: translate(5%, -3%) rotate(405deg);
-    }
-}
-
-@keyframes moveGradient3 {
-    0% {
-        transform: translate(-4%, 8%) rotate(120deg);
-    }
-    25% {
-        transform: translate(6%, 3%) rotate(180deg);
-    }
-    50% {
-        transform: translate(-7%, -12%) rotate(250deg);
-    }
-    75% {
-        transform: translate(9%, 4%) rotate(330deg);
-    }
-    100% {
-        transform: translate(-4%, 8%) rotate(480deg);
-    }
-}
+/* Animations removed - gradient positions are now updated via JavaScript */
 
 .home-container {
     max-width: 100%;
@@ -248,10 +197,76 @@ body.dark-mode .tile {
     grid-row: 1 / 3;
 }
 
-/* Watchlist - Bottom Left under SP500 (1 column, spans rows 2-3 for 70% height) */
-.tile-watchlist {
+/* Tile Swap Container - Bottom Left under SP500 */
+.tile-swap-container {
     grid-column: 1 / 2;
     grid-row: 2 / 4;
+    position: relative;
+    overflow: hidden;
+    border-radius: clamp(6px, 1.5vw, 24px);
+    /* Use a slightly more opaque background and disable backdrop-filter to avoid GPU tile seams */
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+        0 8px 32px 0 rgba(31, 38, 135, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Isolate painting and promote to its own layer to reduce flicker */
+    contain: paint;
+    isolation: isolate;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+body.dark-mode .tile-swap-container {
+    background: rgba(44, 44, 46, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.tile-swap-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.6) 50%, 
+        transparent 100%);
+    z-index: 1;
+}
+
+/* Watchlist & Subway - Bottom Left under SP500 (1 column, spans rows 2-3 for 70% height) */
+.tile-watchlist,
+.tile-subway {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.tile-watchlist::before,
+.tile-subway::before {
+    display: none;
+}
+
+.swappable-tile {
+    transform: translateX(-100%);
+}
+
+.swappable-tile.active {
+    transform: translateX(0);
 }
 
 /* Weather - Bottom (columns 2-6, 1 row) spanning from middle to right - 15% shorter */
@@ -378,6 +393,7 @@ body.dark-mode .sp500-change .change-value {
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    /* Distribute free space between rows so the list fills the container without stretching item heights */
     justify-content: space-between;
 }
 
@@ -388,10 +404,11 @@ body.dark-mode .sp500-change .change-value {
     gap: clamp(0.15rem, 0.8vw, 0.6rem);
     padding: clamp(0.1rem, 0.6vh, 0.5rem);
     background: rgba(255, 255, 255, 0.2);
+    background-clip: padding-box;
     border-radius: clamp(3px, 0.7vw, 10px);
     transition: all 0.3s ease;
-    flex: 1;
-    min-height: 0;
+    /* Let items size to content to avoid subpixel stretching */
+    min-height: unset;
 }
 
 body.dark-mode .stock-item {
@@ -653,6 +670,8 @@ body.dark-mode .news-content {
     margin-bottom: clamp(0.2rem, 0.5vh, 0.4rem);
     color: #1d1d1f;
     display: -webkit-box;
+    /* Add standard line-clamp for compatibility alongside webkit */
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -806,6 +825,8 @@ body.dark-mode .footer-info .info-item span {
     color: #1d1d1f;
     white-space: nowrap;
     transition: color 0.3s ease;
+    font-variant-numeric: tabular-nums;
+    min-width: 9rem;
 }
 
 body.dark-mode #current-time {
@@ -818,5 +839,86 @@ body.dark-mode #current-time {
 }
 
 body.dark-mode #weather-desc {
+    color: #f5f5f7;
+}
+
+/* ==================== Subway Tile ==================== */
+.tile-subway .tile-title {
+    font-size: clamp(0.35rem, 2.8vh, 2.4rem);
+    margin-bottom: clamp(0.2rem, 1vh, 0.8rem);
+}
+
+.subway-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.05rem, 0.3vh, 0.25rem);
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    justify-content: flex-start;
+}
+
+.subway-item {
+    display: grid;
+    grid-template-columns: clamp(1.5rem, 5vh, 4.5rem) 1fr auto;
+    align-items: center;
+    gap: clamp(0.2rem, 1vw, 0.8rem);
+    padding: clamp(0.15rem, 0.9vh, 0.8rem) clamp(0.2rem, 0.8vw, 0.7rem);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: clamp(3px, 0.7vw, 10px);
+    transition: all 0.3s ease;
+    flex: 1;
+    min-height: 0;
+    margin-bottom: clamp(0.1rem, 0.5vh, 0.4rem);
+}
+
+.subway-item:last-child {
+    margin-bottom: 0;
+}
+
+body.dark-mode .subway-item {
+    background: rgba(58, 58, 60, 0.4);
+}
+
+.subway-line-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #00933c;
+    color: white;
+    font-weight: 700;
+    width: clamp(1.5rem, 5vh, 4.5rem);
+    height: clamp(1.5rem, 5vh, 4.5rem);
+    border-radius: 50%;
+    font-size: clamp(0.4rem, 3.2vh, 2.8rem);
+    box-shadow: 0 2px 8px rgba(0, 147, 60, 0.5);
+    flex-shrink: 0;
+    line-height: 1;
+    padding-top: 0.05em;
+}
+
+.subway-destination {
+    font-size: clamp(0.28rem, 2.2vh, 1.9rem);
+    font-weight: 500;
+    color: #1d1d1f;
+    text-align: left;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .subway-destination {
+    color: #f5f5f7;
+}
+
+.subway-minutes {
+    font-size: clamp(0.35rem, 2.8vh, 2.5rem);
+    font-weight: 700;
+    color: #1d1d1f;
+    text-align: right;
+    min-width: clamp(1.5rem, 6vw, 4rem);
+    letter-spacing: -0.02em;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .subway-minutes {
     color: #f5f5f7;
 }
